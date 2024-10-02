@@ -6,9 +6,9 @@ void setup() {
 }
 
 void loop() {
-  String SensorData = String("0,0,0,0,0,0,0,0.");
+  String SensorData = String("100,100,100,100,100,100,100,100.");
   
-  Serial.println(SensorData);
+  Serial.print(SensorData);
   
-  delay(2);
+  delay(10);
 }
