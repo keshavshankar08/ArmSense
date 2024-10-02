@@ -1,34 +1,30 @@
+import logging
 import numpy as np
-import serial
 
-class feature_extractor:
-    def __init__(self, port, baud_rate):
-        self.device = serial.Serial(port, baud_rate, timeout=1)
-        self.signal = np.array([])
-        self.features = np.array([])
-    
-    def receive_signal(self, rate):
-        # read signal from serial at rate
-        # store signal in self.signal
+class FeatureExtractor:
+    def __init__(self, signal_receiver, window_duration):
+        """
+        Initializes the FeatureExtractor.
+
+        :param signal_receiver: Instance of SignalReceiver.
+        :param window_duration: Duration of the window in seconds.
+        """
+        self.signal_receiver = signal_receiver
+        self.window_duration = window_duration
+        self.window_size = int(self.window_duration * self.signal_receiver.sampling_rate)
+        self.running = False
+
+    def extract_features(self):
+        """
+        Extracts features for most recent window.
+        """
+        window_signals = self.signal_receiver.get_last_n_signals(self.window_size)
+        if window_signals:
+            feature_vector = self.compute_feature_matrix(window_signals)
+            return feature_vector
+        else:
+            logging.debug("Insufficient data for feature extraction.")
+
+
+    def compute_feature_matrix(self, window_signals):
         pass
-
-    def read_signal(self, rate):
-        # 1st run
-        # read signal from self.signal at rate
-        # once 200ms window signals collected
-        # pass to compute feature matrix method
-
-        # concecutive runs
-        # once another 50ms signals collected
-        # use 50-200ms of buffer + 50ms new signals as new 200ms window
-        # pass to compute feature matrix method
-        # repeat
-        pass
-
-    def compute_feature_matrix(self, signals):
-        # compute feature matrix from signal
-        # store in self.features
-        pass
-
-if __name__ == "__main__":
-    pass

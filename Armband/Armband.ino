@@ -10,5 +10,5 @@ void loop() {
   
   Serial.print(SensorData);
   
-  delay(2);
+  delay(10);
 }
