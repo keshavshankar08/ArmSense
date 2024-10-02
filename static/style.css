@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sEMG Signal Display</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div id="screen1" {% if paired %}style="display: none;"{% endif %}>
+        <h1>Armband Pairing</h1>
+        <button id="pairButton">Pair Armband</button>
+    </div>
+
+    <div id="screen2" {% if not paired %}style="display: none;"{% endif %}>
+        <h1>sEMG Signal Display</h1>
+        <div id="controls">
+            <button id="collectButton">Collect Data</button>
+            <button id="trainButton">Train Model</button>
+            <button id="evaluateButton">Evaluate Model</button>
+        </div>
+        <div id="semgContainer">
+            {% for i in range(8) %}
+            <div class="semgChart" id="semgChart{{ i }}"></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
