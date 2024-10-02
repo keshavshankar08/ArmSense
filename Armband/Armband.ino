@@ -6,7 +6,7 @@ void setup() {
 }
 
 void loop() {
-  String SensorData = String("100,100,100,100,100,100,100,100.");
+  String SensorData = String("4096,4096,4096,4096,4096,4096,4096,4096.");
   
   Serial.print(SensorData);
   
