@@ -1,32 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>sEMG Signal Display</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-    <div id="screen1" {% if paired %}style="display: none;"{% endif %}>
-        <h1>Armband Pairing</h1>
-        <button id="pairButton">Pair Armband</button>
-    </div>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-    <div id="screen2" {% if not paired %}style="display: none;"{% endif %}>
-        <h1>sEMG Signal Display</h1>
-        <div id="controls">
-            <button id="collectButton">Collect Data</button>
-            <button id="trainButton">Train Model</button>
-            <button id="evaluateButton">Evaluate Model</button>
-        </div>
-        <div id="semgContainer">
-            {% for i in range(8) %}
-            <div class="semgChart" id="semgChart{{ i }}"></div>
-            {% endfor %}
-        </div>
-    </div>
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
+    height: 100%;
+}
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
+h1 {
+    text-align: center;
+    margin: 10px 0;
+    font-size: 24px;
+}
+
+#semgContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 0 5vh; /* 25% of the viewport height */
+    margin-bottom: 20px;
+}
+
+.semgWindow {
+    width: 100%;
+    height: 100%;
+    border: none;
+    padding: 0;
+    background-color: transparent;
+}
+
+.semgWindow h4 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    text-align: center;
+}
+
+.chart-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.semgWindow canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex: 0 0 auto;
+}
+#semgContainer {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.semgWindow h4 {
+    display: none;
+}
+
+button {
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 100px) {
+    .semgWindow {
+        width: 20%;
+    }
+
+    button {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+}

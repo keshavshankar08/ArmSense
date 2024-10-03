@@ -7,22 +7,22 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div id="screen1" {% if paired %}style="display: none;"{% endif %}>
-        <h1>Wow this works</h1>
-        <button id="collectButton">Collect Data</button>
-    </div>
-
-    <div id="screen2" {% if not paired %}style="display: none;"{% endif %}>
+    <div class="container">
         <h1>sEMG Signal Display</h1>
-        <div id="controls">
-            <button id="collectButton">Collect Data</button>
-            <button id="trainButton">Train Model</button>
-            <button id="evaluateButton">Evaluate Model</button>
-        </div>
+        
         <div id="semgContainer">
-            {% for i in range(8) %}
-            <div class="semgChart" id="semgChart{{ i }}"></div>
-            {% endfor %}
+            <div class="semgWindow">
+                <h4>Channel 1</h4>
+                <div class="chart-container">
+                    <canvas id="semgChart0"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="controls">
+            <button onclick="collectData()">Collect Data</button>
+            <button onclick="trainModel()">Train Model</button>
+            <button onclick="evaluateModel()">Evaluate Model</button>
         </div>
     </div>
 
