@@ -22,7 +22,9 @@
         </div>
 
         <div id="controls">
-            <button onclick="collectData()">Collect Data</button>
+            <a href="{{ url_for('data_collection') }}">
+                <button>Collect Data</button>
+            </a>
             <button onclick="trainModel()">Train Model</button>
             <button onclick="evaluateModel()">Evaluate Model</button>
         </div>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Collection - Make a Fist</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .instruction-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #fistImage {
+            max-width: 300px;
+            margin: 20px auto;
+            display: block;
+        }
+        #counter {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        #message {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Data Collection: Make a Fist</h1>
+        
+        <div class="instruction-container">
+            <p>Please make a fist when instructed. Repeat 3 times.</p>
+            <img id="fistImage" src="{{ url_for('static', filename='fist_image.jpg') }}" alt="Person making a fist">
+            <div id="counter">Repetitions: <span id="repCount">0</span>/3</div>
+            <div id="message"></div>
+            <button id="startButton" onclick="startCollection()">Start</button>
+        </div>
+    </div>
+
+    <script>
+        let repCount = 0;
+        const totalReps = 3;
+        const collectionDuration = 5000; // 5 seconds for each collection
+
+        function startCollection() {
+            document.getElementById('startButton').style.display = 'none';
+            collectData();
+        }
+
+        function collectData() {
+            if (repCount < totalReps) {
+                repCount++;
+                document.getElementById('repCount').textContent = repCount;
+                document.getElementById('message').textContent = "Make a fist now!";
+                
+                // Simulating data collection
+                setTimeout(() => {
+                    document.getElementById('message').textContent = "Relax your hand.";
+                    
+                    // Prepare for next repetition or finish
+                    setTimeout(() => {
+                        if (repCount < totalReps) {
+                            document.getElementById('message').textContent = "Prepare for next repetition...";
+                            setTimeout(collectData, 2000);
+                        } else {
+                            finishCollection();
+                        }
+                    }, 2000);
+                }, collectionDuration);
+            }
+        }
+
+        function finishCollection() {
+            document.getElementById('message').textContent = "Data collection complete!";
+            // Here you would typically send the collected data to the server
+            // For now, we'll just simulate this with a timeout
+            setTimeout(() => {
+                window.location.href = "{{ url_for('collection') }}";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+

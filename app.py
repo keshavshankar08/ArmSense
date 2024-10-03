@@ -62,5 +62,10 @@ def log():
     app.logger.info(f'Client log: {message}')
     return jsonify({'success': True})
 
+@app.route('/data_collection')
+def data_collection():
+    app.logger.info('Rendering data_collection page')
+    return render_template('data_collection.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
