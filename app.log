@@ -1,3 +1,122 @@
-2024-10-03 14:34:16,372 - app - INFO - Client log: updateCharts: Updating charts
-2024-10-03 14:34:16,373 - app - INFO - Generating sEMG data
-2024-10-03 14:34:16,397 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:48:52,454 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:48:52,455 - app - INFO - Generating sEMG data
+2024-10-03 14:48:52,504 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:48:54,251 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:48:54,254 - app - INFO - Generating sEMG data
+2024-10-03 14:48:54,354 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:48:55,385 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:48:55,386 - app - INFO - Generating sEMG data
+2024-10-03 14:48:55,486 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:48:57,385 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:48:57,386 - app - INFO - Generating sEMG data
+2024-10-03 14:48:57,475 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:49:02,477 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:49:02,478 - app - INFO - Generating sEMG data
+2024-10-03 14:49:02,563 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:49:06,427 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:49:06,428 - app - INFO - Generating sEMG data
+2024-10-03 14:49:06,516 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:49:14,725 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:49:14,726 - app - INFO - Generating sEMG data
+2024-10-03 14:49:14,816 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:49:21,874 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:49:21,875 - app - INFO - Generating sEMG data
+2024-10-03 14:49:21,955 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:49:38,573 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:49:38,574 - app - INFO - Generating sEMG data
+2024-10-03 14:49:38,651 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:50:03,476 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:50:03,477 - app - INFO - Generating sEMG data
+2024-10-03 14:50:03,558 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:50:08,080 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:50:08,081 - app - INFO - Generating sEMG data
+2024-10-03 14:50:08,169 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:50:48,047 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:50:48,048 - app - INFO - Generating sEMG data
+2024-10-03 14:50:48,132 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:51:28,080 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:51:28,082 - app - INFO - Generating sEMG data
+2024-10-03 14:51:28,172 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:51:54,546 - app - INFO - Rendering index page
+2024-10-03 14:51:54,587 - app - INFO - Client log: DOMContentLoaded: Event listener setup complete
+2024-10-03 14:51:55,935 - app - INFO - Client log: pairArmband: Attempting to pair armband
+2024-10-03 14:51:55,936 - app - INFO - Attempting to pair armband
+2024-10-03 14:51:55,946 - app - INFO - Rendering collection page
+2024-10-03 14:51:55,989 - app - INFO - Client log: initializeCharts: Initializing charts
+2024-10-03 14:51:56,019 - app - INFO - Client log: initializeCharts: Charts initialized successfully
+2024-10-03 14:51:56,020 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:51:56,020 - app - INFO - Client log: DOMContentLoaded: Event listener setup complete
+2024-10-03 14:51:56,021 - app - INFO - Generating sEMG data
+2024-10-03 14:51:56,051 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:51:57,023 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:51:57,025 - app - INFO - Generating sEMG data
+2024-10-03 14:51:57,049 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:51:58,024 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:51:58,025 - app - INFO - Generating sEMG data
+2024-10-03 14:51:58,049 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:51:59,033 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:51:59,034 - app - INFO - Generating sEMG data
+2024-10-03 14:51:59,054 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:00,042 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:00,043 - app - INFO - Generating sEMG data
+2024-10-03 14:52:00,072 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:01,053 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:01,054 - app - INFO - Generating sEMG data
+2024-10-03 14:52:01,080 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:02,053 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:02,054 - app - INFO - Generating sEMG data
+2024-10-03 14:52:02,082 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:03,058 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:03,059 - app - INFO - Generating sEMG data
+2024-10-03 14:52:03,090 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:04,059 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:04,059 - app - INFO - Generating sEMG data
+2024-10-03 14:52:04,083 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:05,077 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:05,077 - app - INFO - Generating sEMG data
+2024-10-03 14:52:05,102 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:06,084 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:06,085 - app - INFO - Generating sEMG data
+2024-10-03 14:52:06,106 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:07,075 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:07,077 - app - INFO - Generating sEMG data
+2024-10-03 14:52:07,098 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:07,843 - app - INFO - Collecting data
+2024-10-03 14:52:07,843 - app - INFO - Client log: collectData: Collecting data
+2024-10-03 14:52:07,845 - app - INFO - Client log: collectData: Data collected successfully
+2024-10-03 14:52:08,041 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:08,042 - app - INFO - Generating sEMG data
+2024-10-03 14:52:08,128 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:09,070 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:09,071 - app - INFO - Generating sEMG data
+2024-10-03 14:52:09,101 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:10,138 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:10,139 - app - INFO - Generating sEMG data
+2024-10-03 14:52:10,174 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:11,080 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:11,081 - app - INFO - Generating sEMG data
+2024-10-03 14:52:11,104 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:12,085 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:12,086 - app - INFO - Generating sEMG data
+2024-10-03 14:52:12,111 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:13,091 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:13,091 - app - INFO - Generating sEMG data
+2024-10-03 14:52:13,118 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:14,100 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:14,100 - app - INFO - Generating sEMG data
+2024-10-03 14:52:14,124 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:15,143 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:15,144 - app - INFO - Generating sEMG data
+2024-10-03 14:52:15,172 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:16,097 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:16,098 - app - INFO - Generating sEMG data
+2024-10-03 14:52:16,121 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:17,098 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:17,099 - app - INFO - Generating sEMG data
+2024-10-03 14:52:17,122 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:18,119 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:18,120 - app - INFO - Generating sEMG data
+2024-10-03 14:52:18,147 - app - INFO - Client log: updateCharts: Charts updated successfully
+2024-10-03 14:52:19,126 - app - INFO - Client log: updateCharts: Updating charts
+2024-10-03 14:52:19,127 - app - INFO - Generating sEMG data
+2024-10-03 14:52:19,153 - app - INFO - Client log: updateCharts: Charts updated successfully

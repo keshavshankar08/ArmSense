@@ -24,29 +24,15 @@ h1 {
 
 #semgContainer {
     display: flex;
-    flex-direction: row;
-    gap: 10px; /* Reduced gap from 20px to 10px */
+    flex-wrap: wrap;
+    gap: 10px;
     flex: 1;
-    margin-bottom: 20px;
     width: 100%;
 }
 
-.column {
-    flex: 1;
-    display: flex;
-    flex-direction: row; /* Changed from column to row */
-    flex-wrap: wrap;     /* Allows wrapping to next line */
-    gap: 5px;            /* Reduced gap from 10px to 5px */
-    width: 50%;
-}
-
-.semgWindow { /* Removed due to typo */
-    /* No styles needed here */
-}
-
-.semgWindow { /* Correct class targeting */
-    flex: 0 1 calc(50% - 10px); /* Each window takes ~50% width of column minus gap */
-    height: 6.25vh; /* Maintains original height */
+.semgWindow {
+    flex: 1 1 calc(25% - 20px); /* Four charts per row */
+    height: calc(50% - 20px);   /* Adjust height to fit two rows */
     border: 1px solid #ccc;
     background-color: #f9f9f9;
     border-radius: 5px;
@@ -63,7 +49,7 @@ canvas {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px; /* Reduced gap from 20px to 10px */
+    gap: 10px;
     padding: 10px 0;
 }
 
@@ -82,23 +68,23 @@ button:hover {
     background-color: #0056b3;
 }
 
+@media (max-width: 1024px) {
+    .semgWindow {
+        flex: 1 1 calc(50% - 20px); /* Two charts per row on smaller screens */
+        height: calc(50% - 20px);
+    }
+}
+
 @media (max-width: 768px) {
     #semgContainer {
         flex-direction: column;
     }
-
-    .column {
-        width: 100%;
-        flex-direction: row; /* Ensure wrapping works in column layout on small screens */
+    .semgWindow {
+        flex: 1 1 100%;
+        height: 200px; /* Adjust height for mobile view */
     }
-
     button {
         padding: 10px 15px;
         font-size: 14px;
-    }
-
-    .semgWindow {
-        flex: 0 1 calc(50% - 10px); /* Adjust if needed for small screens */
-        height: 6.25vh; /* Maintain reduced chart height on smaller screens */
     }
 }

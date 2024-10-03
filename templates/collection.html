@@ -4,25 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>sEMG Signal Display</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>sEMG Signal Display</h1>
         
         <div id="semgContainer">
-            <div class="column">
-                <div class="semgWindow"><canvas id="semgChart0"></canvas></div>
-                <div class="semgWindow"><canvas id="semgChart1"></canvas></div>
-                <div class="semgWindow"><canvas id="semgChart2"></canvas></div>
-                <div class="semgWindow"><canvas id="semgChart3"></canvas></div>
-            </div>
-            <div class="column">
-                <div class="semgWindow"><canvas id="semgChart4"></canvas></div>
-                <div class="semgWindow"><canvas id="semgChart5"></canvas></div>
-                <div class="semgWindow"><canvas id="semgChart6"></canvas></div>
-                <div class="semgWindow"><canvas id="semgChart7"></canvas></div>
-            </div>
+            <div class="semgWindow"><canvas id="semgChart0"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart1"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart2"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart3"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart4"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart5"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart6"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart7"></canvas></div>
         </div>
 
         <div id="controls">
