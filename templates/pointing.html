@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Collection - Make a Fist</title>
+    <title>Data Collection - Point with Index Finger</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         .instruction-container {
             text-align: center;
             margin-top: 20px;
         }
-        #fistImage {
+        #pointingImage {
             max-width: 300px;
             margin: 20px auto;
             display: block;
@@ -28,11 +28,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Data Collection: Make a Fist</h1>
+        <h1>Data Collection: Point with Index Finger</h1>
         
         <div class="instruction-container">
-            <p>Please make a fist when instructed. Repeat 3 times.</p>
-            <img id="fistImage" src="{{ url_for('static', filename='fist_image.jpg') }}" alt="Person making a fist">
+            <p>Please point with your index finger when instructed. Repeat 3 times.</p>
+            <img id="pointingImage" src="{{ url_for('static', filename='pointing_image.jpg') }}" alt="Person pointing with index finger">
             <div id="counter">Repetitions: <span id="repCount">0</span>/3</div>
             <div id="message"></div>
             <button id="startButton" onclick="startCollection()">Start</button>
@@ -53,7 +53,7 @@
             if (repCount < totalReps) {
                 repCount++;
                 document.getElementById('repCount').textContent = repCount;
-                document.getElementById('message').textContent = "Make a fist now!";
+                document.getElementById('message').textContent = "Point with your index finger now!";
                 
                 setTimeout(() => {
                     document.getElementById('message').textContent = "Relax your hand.";
@@ -72,9 +72,8 @@
 
         function finishCollection() {
             document.getElementById('message').textContent = "Data collection complete!";
-
             setTimeout(() => {
-                window.location.href = "{{ url_for('peace_sign') }}";
+                window.location.href = "{{ url_for('thumbs_up') }}";
             }, 3000);
         }
     </script>

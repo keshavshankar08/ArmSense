@@ -88,3 +88,22 @@ button:hover {
         font-size: 14px;
     }
 }
+
+.button-container {
+    text-align: center;
+    margin-top: 40px;
+}
+
+#pairButton {
+    padding: 15px 30px;
+    font-size: 18px;
+    background-color: #377ba8;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#pairButton:hover {
+    background-color: #2a5d7a;
+}

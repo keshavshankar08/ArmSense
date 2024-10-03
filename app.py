@@ -62,10 +62,37 @@ def log():
     app.logger.info(f'Client log: {message}')
     return jsonify({'success': True})
 
-@app.route('/data_collection')
+@app.route('/data_collection', methods=['GET', 'POST'])
 def data_collection():
     app.logger.info('Rendering data_collection page')
+    if request.method == 'POST':
+        # Redirect to the next page in the sequence
+        return redirect(url_for('peace_sign'))
     return render_template('data_collection.html')
+
+@app.route('/peace_sign', methods=['GET', 'POST'])
+def peace_sign():
+    app.logger.info('Rendering peace_sign page')
+    if request.method == 'POST':
+        # Redirect to the next page in the sequence
+        return redirect(url_for('pointing'))
+    return render_template('peace_sign.html')
+
+@app.route('/pointing', methods=['GET', 'POST'])
+def pointing():
+    app.logger.info('Rendering pointing page')
+    if request.method == 'POST':
+        # Redirect to the next page in the sequence
+        return redirect(url_for('thumbs_up'))
+    return render_template('pointing.html')
+
+@app.route('/thumbs_up', methods=['GET', 'POST'])
+def thumbs_up():
+    app.logger.info('Rendering thumbs_up page')
+    if request.method == 'POST':
+        # Redirect back to collection page
+        return redirect(url_for('collection'))
+    return render_template('thumbs_up.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

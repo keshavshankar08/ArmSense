@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Collection - Make a Fist</title>
+    <title>Data Collection - Thumbs Up</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         .instruction-container {
             text-align: center;
             margin-top: 20px;
         }
-        #fistImage {
+        #thumbsUpImage {
             max-width: 300px;
             margin: 20px auto;
             display: block;
@@ -28,11 +28,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Data Collection: Make a Fist</h1>
+        <h1>Data Collection: Thumbs Up</h1>
         
         <div class="instruction-container">
-            <p>Please make a fist when instructed. Repeat 3 times.</p>
-            <img id="fistImage" src="{{ url_for('static', filename='fist_image.jpg') }}" alt="Person making a fist">
+            <p>Please give a thumbs up when instructed. Repeat 3 times.</p>
+            <img id="thumbsUpImage" src="{{ url_for('static', filename='thumbs_up_image.jpg') }}" alt="Person giving a thumbs up">
             <div id="counter">Repetitions: <span id="repCount">0</span>/3</div>
             <div id="message"></div>
             <button id="startButton" onclick="startCollection()">Start</button>
@@ -42,7 +42,7 @@
     <script>
         let repCount = 0;
         const totalReps = 3;
-        const collectionDuration = 1000; 
+        const collectionDuration = 1000;
 
         function startCollection() {
             document.getElementById('startButton').style.display = 'none';
@@ -53,7 +53,7 @@
             if (repCount < totalReps) {
                 repCount++;
                 document.getElementById('repCount').textContent = repCount;
-                document.getElementById('message').textContent = "Make a fist now!";
+                document.getElementById('message').textContent = "Give a thumbs up now!";
                 
                 setTimeout(() => {
                     document.getElementById('message').textContent = "Relax your hand.";
@@ -72,9 +72,8 @@
 
         function finishCollection() {
             document.getElementById('message').textContent = "Data collection complete!";
-
             setTimeout(() => {
-                window.location.href = "{{ url_for('peace_sign') }}";
+                window.location.href = "{{ url_for('collection') }}";
             }, 3000);
         }
     </script>
