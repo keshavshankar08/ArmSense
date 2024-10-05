@@ -56,9 +56,9 @@ class SignalReceiver:
         while self.running:
             start_time = time.time()
             try:
-                line = self.device.read_until(b'.').decode('utf-8').strip()
+                line = self.device.read_until(b'.').decode('utf-8').strip('.')
                 if line:
-                    parts = line.split(',')
+                    parts = line.split('.')[0].split(',')
                     if len(parts) != 8:
                         logging.warning(f"Incorrect data form received: {line}")
                         continue

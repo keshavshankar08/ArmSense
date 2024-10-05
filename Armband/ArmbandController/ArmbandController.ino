@@ -1,3 +1,5 @@
+// THIS IS FOR THE ARMBAND CONTROLS
+
 #include <Arduino.h>
 #include <BluetoothSerial.h>
 
@@ -6,7 +8,7 @@ void setup() {
 }
 
 void loop() {
-  String SensorData = String("100,100,100,100,100,100,100,100.");
+  String SensorData = String("4096,4096,4096,4096,4096,4096,4096,4096.");
   
   Serial.print(SensorData);
   
