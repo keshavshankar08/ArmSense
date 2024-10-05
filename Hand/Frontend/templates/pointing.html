@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Collection - Point with Index Finger</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .instruction-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #pointingImage {
+            max-width: 300px;
+            margin: 20px auto;
+            display: block;
+        }
+        #counter {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        #message {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Data Collection: Point with Index Finger</h1>
+        
+        <div class="instruction-container">
+            <p>Please point with your index finger when instructed. Repeat 3 times.</p>
+            <img id="pointingImage" src="{{ url_for('static', filename='pointing_image.jpg') }}" alt="Person pointing with index finger">
+            <div id="counter">Repetitions: <span id="repCount">0</span>/3</div>
+            <div id="message"></div>
+            <button id="startButton" onclick="startCollection()">Start</button>
+        </div>
+    </div>
+
+    <script>
+        let repCount = 0;
+        const totalReps = 3;
+        const collectionDuration = 1000; 
+
+        function startCollection() {
+            document.getElementById('startButton').style.display = 'none';
+            collectData();
+        }
+
+        function collectData() {
+            if (repCount < totalReps) {
+                repCount++;
+                document.getElementById('repCount').textContent = repCount;
+                document.getElementById('message').textContent = "Point with your index finger now!";
+                
+                setTimeout(() => {
+                    document.getElementById('message').textContent = "Relax your hand.";
+                    
+                    setTimeout(() => {
+                        if (repCount < totalReps) {
+                            document.getElementById('message').textContent = "Prepare for next repetition...";
+                            setTimeout(collectData, 2000);
+                        } else {
+                            finishCollection();
+                        }
+                    }, 2000);
+                }, collectionDuration);
+            }
+        }
+
+        function finishCollection() {
+            document.getElementById('message').textContent = "Data collection complete!";
+            setTimeout(() => {
+                window.location.href = "{{ url_for('thumbs_up') }}";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
+```
+</rewritten_file>
