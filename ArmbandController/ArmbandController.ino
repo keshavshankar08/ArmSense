@@ -1,3 +1,5 @@
+// THIS IS FOR THE ARMBAND CONTROLS
+
 #include <Arduino.h>
 #include <BluetoothSerial.h>
 
