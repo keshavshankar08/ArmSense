@@ -1,34 +1,42 @@
 import serial, threading, time, logging
 from collections import deque
+import numpy as np
 
 class SignalReceiver:
-    def __init__(self, port, baud_rate, sampling_rate, buffer_size):
+    def __init__(self, sampling_rate):
         """
         Initializes the SignalReceiver.
 
-        :param port: Serial port to connect to
-        :param baud_rate: Baud rate for serial communication.
         :param sampling_rate: Sampling rate in Hz
-        :param buffer_size: Maximum number of signals to store in the buffer.
         """
-        self.port = port
-        self.baud_rate = baud_rate
         self.sampling_rate = sampling_rate
-        self.buffer_size = buffer_size
 
-        try:
-            self.device = serial.Serial(port, baud_rate, timeout=1)
-            logging.info(f"Connected to serial port {port} at {baud_rate} baud.")
-        except serial.SerialException as e:
-            logging.error(f"Failed to connect to serial port {port}: {e}")
-            raise e
-
-        self.signal_buffer = deque(maxlen=self.buffer_size)
+        self.port = '/dev/tty.usbserial-0001'
+        self.baud_rate = 115200
+        self.device = None
+        self.signal_buffer = deque(maxlen=1000)
         self.buffer_lock = threading.Lock()
         self.running = False
         self.thread = None
 
-    def start(self):
+    def find_devices(self):
+        # TODO: find devices to connect to
+        pass
+
+    def connect(self):
+        """
+        Connects to the serial port.
+        """
+        # TODO: set port based on found device
+        # TODO: set baud rate based on found device
+        try:
+            self.device = serial.Serial(self.port, self.baud_rate, timeout=1)
+            logging.info(f"Connected to serial port {self.port} at {self.baud_rate} baud.")
+        except serial.SerialException as e:
+            logging.error(f"Failed to connect to serial port {self.port}: {e}")
+            raise e
+
+    def start_reception(self):
         """
         Starts the signal reception thread.
         """
@@ -37,7 +45,7 @@ class SignalReceiver:
         self.thread.start()  
         logging.info("SignalReceiver thread started.")
 
-    def stop(self):
+    def stop_reception(self):
         """
         Stops the signal reception thread.
         """
@@ -57,6 +65,7 @@ class SignalReceiver:
             start_time = time.time()
             try:
                 line = self.device.read_until(b'.').decode('utf-8').strip('.')
+                print(line)
                 if line:
                     parts = line.split('.')[0].split(',')
                     if len(parts) != 8:
@@ -90,6 +99,6 @@ class SignalReceiver:
         """
         with self.buffer_lock:
             if len(self.signal_buffer) >= n:
-                return list(self.signal_buffer)[-n:]
+                return np.array(list(self.signal_buffer)[-n:])
             else:
                 return None
