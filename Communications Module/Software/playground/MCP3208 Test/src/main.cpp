@@ -29,5 +29,5 @@ void loop() {
   Serial.print("["); Serial.print(count); Serial.println("]");
   count++;
   
-  delay(1000);
+  delay(1);
 }
