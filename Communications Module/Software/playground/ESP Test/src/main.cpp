@@ -124,7 +124,8 @@ void setup() {
 void loop() {
 
   if (deviceConnected) {
-    pTxCharacteristic->setValue(&txValue, 0x56);
+    // pTxCharacteristic->setValue(&txValue, 0x56);
+    pTxCharacteristic->setValue("Test String");  //String value
     pTxCharacteristic->notify();
     txValue++;
     delay(1);  // bluetooth stack will go into congestion, if too many packets are sent
