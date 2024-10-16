@@ -21,20 +21,7 @@ class ControllerBackend:
 
         self.signal_receiver = SignalReceiver(self.sampling_rate)
         self.data_collector = DataCollector(self.signal_receiver, self.sampling_rate, self.window_size, self.interval_size)
+        self.trainer = Trainer()
 
 if __name__ == '__main__':
-    controller_backend = ControllerBackend()
-    controller_backend.signal_receiver.connect()
-    controller_backend.signal_receiver.start_reception()
-    time.sleep(1)
-
-    controller_backend.data_collector.start_collection(1) # say 1 is fist
-    time.sleep(3)
-    controller_backend.data_collector.stop_collection()
-
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        controller_backend.data_collector.stop_collection()
-        controller_backend.signal_receiver.stop_reception()
+    pass
