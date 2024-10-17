@@ -5,6 +5,8 @@ import numpy as np
 from bleak import BleakClient
 import asyncio
 
+# logging.basicConfig(level=logging.DEBUG)
+
 class SignalReceiver:
     def __init__(self, sampling_rate):
         """
@@ -29,6 +31,7 @@ class SignalReceiver:
         self.WRITE_UUID = None
         self.READ_UUID = None
         self.DEVICE = "D8:13:2A:7F:2F:FE"
+        # self.DEVICE = "08:A6:F7:BC:8F:62"
 
         # Characteristic UUID for communication (you need the correct one for your device)
         self.READ_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -105,6 +108,8 @@ class SignalReceiver:
                     with self.buffer_lock:
                         self.signal_buffer.append(signal)
                     logging.debug(f"Received signal: {signal}")
+                    logging.debug(f"Last added item in buffer: {self.signal_buffer[-1]}")
+                    logging.debug(f"Buffer Length: {len(self.signal_buffer)}")
             except Exception as e:
                 logging.error(f"Error receiving signals: {e}")
 

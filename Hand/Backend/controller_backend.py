@@ -5,6 +5,9 @@ from predictor import *
 from feature_extractor import *
 import time
 import numpy as np
+import asyncio
+
+# logging.basicConfig(level=logging.DEBUG)
 
 class ControllerBackend:
     def __init__(self, sampling_rate=100, window_size=.2, interval_size=.05):
@@ -24,8 +27,8 @@ class ControllerBackend:
 
 if __name__ == '__main__':
     controller_backend = ControllerBackend()
-    controller_backend.signal_receiver.connect()
-    controller_backend.signal_receiver.start_reception()
+    asyncio.run(controller_backend.signal_receiver.connect())
+    asyncio.run(controller_backend.signal_receiver.start_reception())
     time.sleep(1)
 
     controller_backend.data_collector.start_collection(1) # say 1 is fist
