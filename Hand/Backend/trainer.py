@@ -28,13 +28,13 @@ class Trainer:
 
     def normalize_data(self):
         '''
-        Normalize the features in the data file.
+        Normalize the features in the data file and store min and max values.
         '''
         data = []
         with open(self.file_name, mode='r', newline='') as file:
             reader = csv.reader(file)
             for row in reader:
-                data.append(row)
+            data.append(row)
 
         data = np.array(data, dtype=float)
         features = data[:, :48]
@@ -49,6 +49,11 @@ class Trainer:
         with open(self.file_name, mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerows(normalized_data)
+
+        with open('vars.csv', mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(min_vals)
+            writer.writerow(max_vals)
 
     def train_model(self):
         '''

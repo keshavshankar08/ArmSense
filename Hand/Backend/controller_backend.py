@@ -3,6 +3,7 @@ from data_collector import *
 from trainer import *
 from predictor import *
 from feature_extractor import *
+
 import time
 import numpy as np
 
@@ -22,6 +23,4 @@ class ControllerBackend:
         self.signal_receiver = SignalReceiver(self.sampling_rate)
         self.data_collector = DataCollector(self.signal_receiver, self.sampling_rate, self.window_size, self.interval_size)
         self.trainer = Trainer()
-
-if __name__ == '__main__':
-    pass
+        self.predictor = Predictor(self.signal_receiver, self.sampling_rate, self.window_size, self.interval_size)

@@ -1,7 +1,5 @@
-import sys
-sys.path.append(".")
 from Hand.Backend.feature_extractor import *
-from Hand.Backend.signal_receiver import *
+
 from collections import deque
 import time, logging, threading
 import numpy as np
