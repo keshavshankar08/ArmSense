@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>sEMG Signal Display</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 </head>
 <body>
     <div class="container">
@@ -30,7 +32,52 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        const socket = io();
+
+        const charts = [];
+        for (let i = 0; i < 8; i++) {
+            const ctx = document.getElementById(`semgChart${i}`).getContext('2d');
+            charts[i] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array(100).fill(''),
+                    datasets: [{
+                        label: `Channel ${i}`,
+                        data: Array(100).fill(0),
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: { display: false },
+                        y: { beginAtZero: true }
+                    },
+                    onClick: function(event, elements) {
+                        if (elements.length > 0) {
+                            const chartIndex = elements[0].datasetIndex;
+                            const chart = charts[chartIndex];
+                            const meta = chart.getDatasetMeta(0);
+                            // Toggle visibility
+                            meta.hidden = meta.hidden === null ? !chart.data.datasets[0].hidden : null;
+                            chart.update();
+                        }
+                    }
+                }
+            });
+        }
+
+        socket.on('semg_data', function(msg) {
+            console.log('Received data:', msg.data);
+            const data = msg.data;
+            data.forEach((channelData, index) => {
+                console.log(`Channel ${index} data:`, channelData);
+                const chart = charts[index];
+                chart.data.datasets[0].data = channelData;
+                chart.update();
+            });
+        });
+    </script>
 </body>
 </html>

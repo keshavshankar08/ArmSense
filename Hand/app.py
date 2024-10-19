@@ -2,16 +2,24 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for
 import random
 import logging
 from logging.handlers import RotatingFileHandler
+import sys
+sys.path.append('.')
+from Backend.controller_backend import ControllerBackend
+from flask_socketio import SocketIO, emit
+import threading
+import time
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
+socketio = SocketIO(app)
+controller_backend = ControllerBackend()
 
 # Set up logging
-handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=1)
-handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-app.logger.addHandler(handler)
-app.logger.setLevel(logging.DEBUG)
+# handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=1)
+# handler.setLevel(logging.INFO)
+# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# handler.setFormatter(formatter)
+# app.logger.addHandler(handler)
+# app.logger.setLevel(logging.DEBUG)
 
 @app.route('/')
 def index():
@@ -73,6 +81,8 @@ def data_collection():
 @app.route('/peace_sign', methods=['GET', 'POST'])
 def peace_sign():
     app.logger.info('Rendering peace_sign page')
+    controller_backend.data_collector.start_collection(1) # say 1 is fist
+    #controller_backend.data_collector.stop_collection()
     if request.method == 'POST':
         # Redirect to the next page in the sequence
         return redirect(url_for('pointing'))
@@ -81,6 +91,7 @@ def peace_sign():
 @app.route('/pointing', methods=['GET', 'POST'])
 def pointing():
     app.logger.info('Rendering pointing page')
+    controller_backend.data_collector.stop_collection()
     if request.method == 'POST':
         # Redirect to the next page in the sequence
         return redirect(url_for('thumbs_up'))
@@ -94,5 +105,34 @@ def thumbs_up():
         return redirect(url_for('collection'))
     return render_template('thumbs_up.html')
 
+# Add SocketIO event handlers
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
+
+@socketio.on('start_data_collection')
+def handle_start_data_collection(data):
+    gesture_id = data.get('gesture_id')
+    controller_backend.data_collector.start_collection(gesture_id)
+    emit('collection_started', {'success': True})
+
+@socketio.on('stop_data_collection')
+def handle_stop_data_collection():
+    controller_backend.data_collector.stop_collection()
+    emit('collection_stopped', {'success': True})
+
+# Function to emit sEMG data
+def emit_semg_data():
+    while True:
+        # Simulate reading data from the SignalReceiver
+        data = [[random.uniform(-1, 1) for _ in range(100)] for _ in range(8)]
+        socketio.emit('semg_data', {'data': data})
+        socketio.sleep(1)  # Adjust the sleep time as needed
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.start_background_task(emit_semg_data)
+    socketio.run(app, debug=True)

@@ -65,7 +65,7 @@ class SignalReceiver:
             start_time = time.time()
             try:
                 line = self.device.read_until(b'.').decode('utf-8').strip('.')
-                print(line)
+                #print(line)
                 if line:
                     parts = line.split('.')[0].split(',')
                     if len(parts) != 8:

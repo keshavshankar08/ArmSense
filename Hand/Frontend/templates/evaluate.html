@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Evaluation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Gesture Evaluation</h1>
+        
+        <div id="evaluationContainer">
+            <h2>Current Gesture Prediction:</h2>
+            <div id="gesturePrediction">
+                <!-- Prediction will be displayed here -->
+            </div>
+        </div>
+
+        <div id="semgContainer">
+            <div class="semgWindow"><canvas id="semgChart0"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart1"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart2"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart3"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart4"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart5"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart6"></canvas></div>
+            <div class="semgWindow"><canvas id="semgChart7"></canvas></div>
+        </div>
+
+        <div id="controls">
+            <button onclick="startEvaluation()">Start Evaluation</button>
+            <button onclick="stopEvaluation()">Stop Evaluation</button>
+            <a href="{{ url_for('index') }}">
+                <button>Back to Home</button>
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        function startEvaluation() {
+            // This function will be implemented to start the evaluation process
+            console.log("Starting evaluation...");
+        }
+
+        function stopEvaluation() {
+            // This function will be implemented to stop the evaluation process
+            console.log("Stopping evaluation...");
+        }
+
+        // This function will be implemented to update the gesture prediction
+        function updateGesturePrediction(prediction) {
+            document.getElementById('gesturePrediction').innerText = prediction;
+        }
+
+        // For demonstration purposes, update with a random gesture every 2 seconds
+        setInterval(() => {
+            const gestures = ['Fist', 'Open Hand', 'Point', 'Pinch', 'Thumbs Up'];
+            const randomGesture = gestures[Math.floor(Math.random() * gestures.length)];
+            updateGesturePrediction(randomGesture);
+        }, 2000);
+    </script>
+</body>
+</html>

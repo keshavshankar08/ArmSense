@@ -1,8 +1,8 @@
-from signal_receiver import *
-from data_collector import *
-from trainer import *
-from predictor import *
-from feature_extractor import *
+from Backend.signal_receiver import *
+from Backend.data_collector import *
+from Backend.trainer import *
+from Backend.predictor import *
+from Backend.feature_extractor import *
 import time
 import numpy as np
 
