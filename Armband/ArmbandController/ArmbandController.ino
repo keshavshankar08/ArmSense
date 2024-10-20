@@ -31,5 +31,6 @@ void loop() {
   SensorData += ".";
 
   Serial.print(SensorData);
+  Serial.println();
   delay(10);
 }

@@ -6,7 +6,7 @@
     <title>sEMG Signal Display</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 </head>
 <body>
     <div class="container">
@@ -33,50 +33,70 @@
     </div>
 
     <script>
-        const socket = io();
+        const socket = io.connect('http://localhost:5001');
+
+        socket.on('connect', () => {
+            console.log('Connected to SocketIO server');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from SocketIO server');
+        });
 
         const charts = [];
+        const dataLength = 100; // Number of data points to display
+
         for (let i = 0; i < 8; i++) {
-            const ctx = document.getElementById(`semgChart${i}`).getContext('2d');
+            const canvas = document.getElementById(`semgChart${i}`);
+            if (!canvas) {
+                console.error(`Canvas element semgChart${i} not found`);
+                continue;
+            }
+            const ctx = canvas.getContext('2d');
             charts[i] = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: Array(100).fill(''),
+                    labels: Array(dataLength).fill(''),
                     datasets: [{
-                        label: `Channel ${i}`,
-                        data: Array(100).fill(0),
+                        label: `Channel ${i + 1}`,
+                        data: Array(dataLength).fill(0),
                         borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        pointRadius: 0, // Hide data points
+                        fill: false
                     }]
                 },
                 options: {
+                    animation: false,
                     scales: {
                         x: { display: false },
                         y: { beginAtZero: true }
                     },
-                    onClick: function(event, elements) {
-                        if (elements.length > 0) {
-                            const chartIndex = elements[0].datasetIndex;
-                            const chart = charts[chartIndex];
-                            const meta = chart.getDatasetMeta(0);
-                            // Toggle visibility
-                            meta.hidden = meta.hidden === null ? !chart.data.datasets[0].hidden : null;
-                            chart.update();
-                        }
+                    elements: {
+                        line: { tension: 0 } // No line smoothing
                     }
                 }
             });
         }
 
         socket.on('semg_data', function(msg) {
-            console.log('Received data:', msg.data);
-            const data = msg.data;
-            data.forEach((channelData, index) => {
-                console.log(`Channel ${index} data:`, channelData);
-                const chart = charts[index];
-                chart.data.datasets[0].data = channelData;
-                chart.update();
-            });
+            console.log('Received semg_data:', msg);
+            const data = msg.data; // data should be an array of 8 values
+            if (Array.isArray(data)) {
+                data.forEach((value, index) => {
+                    console.log(`Updating chart ${index} with value ${value}`);
+                    const chart = charts[index];
+                    if (chart) {
+                        chart.data.datasets[0].data.push(value);
+                        if (chart.data.datasets[0].data.length > dataLength) {
+                            chart.data.datasets[0].data.shift();
+                        }
+                        chart.update('none'); // Update chart without animation
+                    }
+                });
+            } else {
+                console.error('Data received is not an array:', data);
+            }
         });
     </script>
 </body>
