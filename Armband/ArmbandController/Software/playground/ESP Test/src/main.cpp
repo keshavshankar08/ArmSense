@@ -121,14 +121,39 @@ void setup() {
   Serial.println("Waiting a client connection to notify...");
 }
 
+const int numChannels = 8;
+const int signalDuration = 1000;
+const int noiseLevel = 50;
+
+unsigned long lastToggleTime = 0;
+bool signalOn = false;
+
 void loop() {
 
+  unsigned long currentTime = millis();
+
+  if (currentTime - lastToggleTime >= signalDuration) {
+    signalOn = !signalOn;
+    lastToggleTime = currentTime;
+  }
+
+  String test = "";
+  for (int chan=0; chan<8; chan++) {
+    int signalValue = signalOn ? random(2000, 4096) : random(0, 1000); // Simulate signal with noise
+    test += String(signalValue);
+    test += ",";
+  }
+  test += ".";
+
+  Serial.println(test);
+
+  //================Bluetooth Code==================
+  std::string payload = test.c_str();
   if (deviceConnected) {
-    // pTxCharacteristic->setValue(&txValue, 0x56);
-    pTxCharacteristic->setValue("Test String");  //String value
+    pTxCharacteristic->setValue(payload);  //String value
     pTxCharacteristic->notify();
     txValue++;
-    delay(1);  // bluetooth stack will go into congestion, if too many packets are sent
+    delay(100);  // bluetooth stack will go into congestion, if too many packets are sent
   }
 
   // disconnecting

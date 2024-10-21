@@ -1,18 +1,16 @@
 {
 	"folders": [
 		{
-			"path": "Software/playground/ESP Test"
-		},
-		{
 			"path": "Software"
 		},
 		{
-			"name": "MCP3208 Test",
-			"path": "Software/playground/MCP3208 Test"
+			"path": "main/ArmbandMCU_V0.1"
 		},
 		{
-			"name": "ArmbandMCU_V0.1",
-			"path": "Software/main/ArmbandMCU_V0.1"
+			"path": "playground/ESP Test"
+		},
+		{
+			"path": "playground/MCP3208 Test"
 		}
 	],
 	"settings": {
