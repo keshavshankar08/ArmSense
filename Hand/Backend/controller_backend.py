@@ -12,8 +12,7 @@ class ControllerBackend:
         '''
         Initialize the ControllerBackend with the given sampling rate, window size, and interval size.
         '''
-
         self.signal_receiver = SignalReceiver()
         self.data_collector = DataCollector(self.signal_receiver)
         self.trainer = Trainer()
-        #self.predictor = Predictor(self.signal_receiver)
+        self.predictor = Predictor(self.signal_receiver)

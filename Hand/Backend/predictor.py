@@ -8,30 +8,33 @@ import time, logging, threading
 import csv
 
 class Predictor:
-    def __init__(self, signal_receiver, sampling_rate, window_size, interval_size):
-        self.signal_receiver = signal_receiver
-        self.sampling_rate = sampling_rate
-        self.window_size = window_size
-        self.interval_size = interval_size
+    def __init__(self, signal_receiver):
+        """
+        Initializes the Predictor object.
 
-        self.model_file_name = "Resources/model.h5"
-        self.model = tf.keras.models.load_model(self.model_file_name)
-        self.feature_extractor = FeatureExtractor(self.sampling_rate)
+        :param signal_receiver: The SignalReceiver object to receive signals from.
+        """
+        self.signal_receiver = signal_receiver
+
+        self.feature_extractor = FeatureExtractor()
         self.buffer_lock = threading.Lock()
         self.running = False
         self.thread = None
 
-        with open('vars.csv', mode='r') as file:
-            reader = csv.reader(file)
-            self.min_vals = np.array(next(reader), dtype=float)
-            self.max_vals = np.array(next(reader), dtype=float)
 
-    def start_prediction(self):
+    def start_prediction(self, model_file_name, min_vals, max_vals, sampling_rate, window_size, interval_size):
         """
         Starts the prediction thread.
+
+        :param model: The trained model to be used for prediction.
+        :param min_vals: The minimum values of the features for normalization.
+        :param max_vals: The maximum values of the features for normalization.
+        :param sampling_rate: The sampling rate of the signal receiver.
+        :param window_size: The size of the window to be collected.
+        :param interval_size: The interval size between each collection
         """
         self.running = True
-        self.thread = threading.Thread(target=self.collect_data, daemon=True)
+        self.thread = threading.Thread(target=self.predict, args=(model_file_name, min_vals, max_vals, sampling_rate, window_size, interval_size,), daemon=True)
         self.thread.start()
         logging.info("Predictor thread started.")
 
@@ -43,23 +46,33 @@ class Predictor:
         if self.thread:
             self.thread.join()
 
-    def predict(self):
+    def predict(self, model_file_name, min_vals, max_vals, sampling_rate, window_size, interval_size):
+        """
+        Predicts the gesture using the trained model.
+
+        :param model_file_name: The file name of the trained model.
+        :param min_vals: The minimum values of the features for normalization.
+        :param max_vals: The maximum values of the features for normalization.
+        :param sampling_rate: The sampling rate of the signal receiver.
+        :param window_size: The size of the window to be collected.
+        :param interval_size: The interval size between each collection
+        """
+        model = tf.keras.models.load_model(model_file_name)
         start_time = time.time()
 
         while self.running:
             current_time = time.time()
             elapsed_time = current_time - start_time
 
-            if (elapsed_time >= self.interval_size):
-                window = self.signal_receiver.get_last_n_signals(int(self.window_size * self.sampling_rate))
+            if elapsed_time >= interval_size:
+                window = self.signal_receiver.get_last_n_signals(int(window_size * sampling_rate))
                 features = self.feature_extractor.extract_features(window)
-                if not any(tf.math.is_nan(features).numpy()):
-                    features = np.array(features, dtype=float)
-                    normalized_features = (features - self.min_vals) / (self.max_vals - self.min_vals)
-                    prediction = self.model.predict(tf.expand_dims(normalized_features, axis=0))
-                    print(f"Prediction: {prediction}")
-                else:
-                    logging.warning("NaN values found in features, skipping prediction.")
+                normalized_features = (features - min_vals) / (max_vals - min_vals)
+                normalized_features = normalized_features.reshape(1, -1)
+                predictions = model.predict(normalized_features)
+                
+                print("Predictions:", predictions)
+                
                 start_time = current_time
 
         

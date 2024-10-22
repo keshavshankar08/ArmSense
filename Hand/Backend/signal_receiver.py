@@ -77,8 +77,11 @@ class SignalReceiver:
                         logging.warning(f"Non-integer value encountered in data: {line}")
                         continue
 
-                    with self.buffer_lock:
-                        self.signal_buffer.append(signal)
+                    if None not in signal:
+                        with self.buffer_lock:
+                            self.signal_buffer.append(signal)
+                    else:
+                        logging.warning(f"Null value encountered in signal: {signal}")
                     logging.debug(f"Received signal: {signal}")
             except Exception as e:
                 logging.error(f"Error receiving signals: {e}")

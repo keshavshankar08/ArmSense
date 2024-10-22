@@ -68,6 +68,7 @@ class Trainer:
         '''
         Train a model using the data in the data file.
 
+        :param input_data_file_name: The name of the input data file.
         :param output_model_file_name: The name of the output model file.
         '''
         data = []
@@ -115,3 +116,16 @@ class Trainer:
         print(f"Test Accuracy: {results_test[1]:.4f}")
 
         self.model.save(output_model_file_name)
+
+    def read_normalization_bounds(self, input_bounds_file_name):
+        '''
+        Read the min and max values of the features for normalization.
+
+        :param input_bounds_file_name: The name of the input bounds file.
+        '''
+        with open(input_bounds_file_name, mode='r', newline='') as file:
+            reader = csv.reader(file)
+            min_vals = next(reader)
+            max_vals = next(reader)
+
+        return np.array(min_vals, dtype=float), np.array(max_vals, dtype=float)

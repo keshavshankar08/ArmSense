@@ -10,6 +10,8 @@ class FeatureExtractor:
     def extract_features(self, window_signals):
         """
         Extracts features for a window.
+
+        :param window_signals: The signals in the window.
         """
         features = []
         for i in range(8):

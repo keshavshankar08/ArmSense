@@ -26,6 +26,11 @@ class DataCollector:
     def start_collection(self, gesture_class, sampling_rate, window_size, interval_size):
         """
         Starts the data collection thread.
+
+        :param gesture_class: The class of the gesture to be collected.
+        :param sampling_rate: The sampling rate of the signal receiver.
+        :param window_size: The size of the window to be collected.
+        :param interval_size: The interval size between each collection
         """
         self.running = True
         self.thread = threading.Thread(target=self.collect_data, args=(gesture_class, sampling_rate, window_size, interval_size,), daemon=True)
@@ -35,6 +40,8 @@ class DataCollector:
     def stop_collection(self, output_data_file_name):
         """
         Stops the data collection thread.
+
+        :param output_data_file_name: The name of the file to save the collected data.
         """
         self.running = False
         if self.thread:
@@ -42,6 +49,14 @@ class DataCollector:
         self.save_data(output_data_file_name)
 
     def collect_data(self, gesture_class, sampling_rate, window_size, interval_size):
+        '''
+        Collects data for the given gesture class.
+
+        :param gesture_class: The class of the gesture to be collected.
+        :param sampling_rate: The sampling rate of the signal receiver.
+        :param window_size: The size of the window to be collected.
+        :param interval_size: The interval size between each collection
+        '''
         start_time = time.time()
 
         while self.running:
@@ -57,6 +72,11 @@ class DataCollector:
                 start_time = current_time
 
     def save_data(self, output_data_file_name):
+        '''
+        Saves the collected data to a file.
+
+        :param output_data_file_name: The name of the file to save the collected data.
+        '''
         with self.buffer_lock:
             with open(output_data_file_name, mode='a', newline='') as file:
                 writer = csv.writer(file)
