@@ -1,3 +1,6 @@
+import sys
+sys.path.append('.')
+
 from Hand.Backend.feature_extractor import *
 
 import tensorflow as tf
@@ -11,7 +14,8 @@ class Predictor:
         self.window_size = window_size
         self.interval_size = interval_size
 
-        self.model = tf.keras.models.load_model("model.h5")
+        self.model_file_name = "Resources/model.h5"
+        self.model = tf.keras.models.load_model(self.model_file_name)
         self.feature_extractor = FeatureExtractor(self.sampling_rate)
         self.buffer_lock = threading.Lock()
         self.running = False

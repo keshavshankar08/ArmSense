@@ -2,8 +2,7 @@ import sys
 sys.path.append('.')
 
 import time
-
-from Hand.Backend.controller_backend import *
+import Hand.Backend.controller_backend as be
 
 if __name__ == '__main__':
     # ----- Setup -----
@@ -11,40 +10,25 @@ if __name__ == '__main__':
     backend = be.ControllerBackend()
 
     # Connect to the serial port
-    backend.signal_receiver.connect()
+    backend.signal_receiver.connect('/dev/tty.usbserial-0001', 115200)
 
     # Start receiving signals
-    backend.signal_receiver.start_reception()
+    backend.signal_receiver.start_reception(100)
 
     # Wait for a second
     time.sleep(1)
-
+    
 
     # ----- Data Collection -----
     # Start a data collection phase for "open" gesture, lasting 3 seconds
-    backend.data_collector.start_collection(0)
+    backend.data_collector.start_collection(0, 100, 0.2, 0.05)
     time.sleep(3)
-    backend.data_collector.stop_collection()
+    backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
 
     # Start a data collection phase for "fist" gesture, lasting 3 seconds
-    backend.data_collector.start_collection(1)
+    backend.data_collector.start_collection(1, 100, 0.2, 0.05)
     time.sleep(3)
-    backend.data_collector.stop_collection()
-
-    # Start a data collection phase for "peace" gesture, lasting 3 seconds
-    backend.data_collector.start_collection(2)
-    time.sleep(3)
-    backend.data_collector.stop_collection()
-
-    # Start a data collection phase for "thumbs up" gesture, lasting 3 seconds
-    backend.data_collector.start_collection(3)
-    time.sleep(3)
-    backend.data_collector.stop_collection()
-
-    # Start a data collection phase for "point" gesture, lasting 3 seconds
-    backend.data_collector.start_collection(4)
-    time.sleep(3)
-    backend.data_collector.stop_collection()
+    backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
 
     # Wait for a second
     time.sleep(1)
@@ -52,20 +36,23 @@ if __name__ == '__main__':
 
     # ----- Data Preperation -----
     # Clean the data
-    backend.trainer.clean_data()
+    backend.trainer.clean_data("Hand/Backend/Resources/data.csv", "Hand/Backend/Resources/cleaned_data.csv")
 
     # Normalize the data
-    backend.trainer.normalize_data()
+    backend.trainer.normalize_data("Hand/Backend/Resources/cleaned_data.csv", "Hand/Backend/Resources/normalized_data.csv", "Hand/Backend/Resources/normalize_bounds.csv")
+
+    # Wait for a second
+    time.sleep(1)
 
 
     # ----- Model training -----
     # Train the model
-    backend.trainer.train_model()
+    backend.trainer.train_model("Hand/Backend/Resources/normalized_data.csv", "Resources/Data/model.h5")
 
     # Wait for a second
     time.sleep(1)
 
 
     # ----- Gesture Predicting -----
-
+    
 
