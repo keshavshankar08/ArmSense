@@ -2,17 +2,16 @@ import numpy as np
 import scipy as sp
 
 class FeatureExtractor:
-    def __init__(self, sampling_rate):
+    def __init__(self):
         """
         Initializes the FeatureExtractor.
-
-        :param sampling_rate: Sampling rate in Hz.
         """
-        self.sampling_rate = sampling_rate
 
     def extract_features(self, window_signals):
         """
         Extracts features for a window.
+
+        :param window_signals: The signals in the window.
         """
         features = []
         for i in range(8):

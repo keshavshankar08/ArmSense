@@ -1,47 +1,48 @@
+import sys
+sys.path.append('.')
+
 import serial, threading, time, logging
 from collections import deque
 import numpy as np
 
 class SignalReceiver:
-    def __init__(self, sampling_rate):
+    def __init__(self):
         """
         Initializes the SignalReceiver.
-
-        :param sampling_rate: Sampling rate in Hz
         """
-        self.sampling_rate = sampling_rate
-
-        self.port = '/dev/tty.usbserial-0001'
-        self.baud_rate = 115200
         self.device = None
         self.signal_buffer = deque(maxlen=1000)
         self.buffer_lock = threading.Lock()
         self.running = False
         self.thread = None
 
-    def find_devices(self):
-        # TODO: find devices to connect to
-        pass
-
-    def connect(self):
+    def connect(self, port, baud_rate):
         """
         Connects to the serial port.
         """
-        # TODO: set port based on found device
-        # TODO: set baud rate based on found device
         try:
-            self.device = serial.Serial(self.port, self.baud_rate, timeout=1)
-            logging.info(f"Connected to serial port {self.port} at {self.baud_rate} baud.")
+            self.device = serial.Serial(port, baud_rate, timeout=1)
+            logging.info(f"Connected to serial port {port} at {baud_rate} baud.")
         except serial.SerialException as e:
-            logging.error(f"Failed to connect to serial port {self.port}: {e}")
+            logging.error(f"Failed to connect to serial port {port}: {e}")
             raise e
+        
+    def disconnect(self):
+        """
+        Disconnects from the serial port.
+        """
+        if self.device:
+            self.device.close()
+            logging.info("Disconnected from serial port.")
+        else:
+            logging.warning("No serial port to disconnect from.")
 
-    def start_reception(self):
+    def start_reception(self, sampling_rate):
         """
         Starts the signal reception thread.
         """
         self.running = True
-        self.thread = threading.Thread(target=self.receive_signals, daemon=True)
+        self.thread = threading.Thread(target=self.receive_signals, args=(sampling_rate,), daemon=True)
         self.thread.start()  
         logging.info("SignalReceiver thread started.")
 
@@ -55,17 +56,16 @@ class SignalReceiver:
         self.device.close()
         logging.info("SignalReceiver thread stopped and serial port closed.")
 
-    def receive_signals(self):
+    def receive_signals(self, sampling_rate):
         """
         Continuously reads signals from the serial port at the specified rate.
         """
-        read_interval = 1.0 / self.sampling_rate
+        read_interval = 1.0 / sampling_rate
 
         while self.running:
             start_time = time.time()
             try:
                 line = self.device.read_until(b'.').decode('utf-8').strip('.')
-                print(line)
                 if line:
                     parts = line.split('.')[0].split(',')
                     if len(parts) != 8:
@@ -77,8 +77,11 @@ class SignalReceiver:
                         logging.warning(f"Non-integer value encountered in data: {line}")
                         continue
 
-                    with self.buffer_lock:
-                        self.signal_buffer.append(signal)
+                    if None not in signal:
+                        with self.buffer_lock:
+                            self.signal_buffer.append(signal)
+                    else:
+                        logging.warning(f"Null value encountered in signal: {signal}")
                     logging.debug(f"Received signal: {signal}")
             except Exception as e:
                 logging.error(f"Error receiving signals: {e}")
