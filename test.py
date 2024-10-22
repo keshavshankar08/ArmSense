@@ -19,38 +19,38 @@ if __name__ == '__main__':
     time.sleep(1)
     
 
-    # ----- Data Collection -----
+    """ # ----- Data Collection -----
     # Start a data collection phase for "open" gesture, lasting 3 seconds
-    #backend.data_collector.start_collection(0, 100, 0.2, 0.05)
-    #time.sleep(3)
-    #backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
+    backend.data_collector.start_collection(0, 100, 0.2, 0.05)
+    time.sleep(3)
+    backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
 
     # Start a data collection phase for "fist" gesture, lasting 3 seconds
-    #backend.data_collector.start_collection(1, 100, 0.2, 0.05)
-    #time.sleep(3)
-    #backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
+    backend.data_collector.start_collection(1, 100, 0.2, 0.05)
+    time.sleep(3)
+    backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
 
     # Wait for a second
-    #time.sleep(1)
+    time.sleep(1)
 
 
     # ----- Data Preperation -----
     # Clean the data
-    #backend.trainer.clean_data("Hand/Backend/Resources/data.csv", "Hand/Backend/Resources/cleaned_data.csv")
+    backend.trainer.clean_data("Hand/Backend/Resources/data.csv", "Hand/Backend/Resources/cleaned_data.csv")
 
     # Normalize the data
-    #backend.trainer.normalize_data("Hand/Backend/Resources/cleaned_data.csv", "Hand/Backend/Resources/normalized_data.csv", "Hand/Backend/Resources/normalize_bounds.csv")
+    backend.trainer.normalize_data("Hand/Backend/Resources/cleaned_data.csv", "Hand/Backend/Resources/normalized_data.csv", "Hand/Backend/Resources/normalize_bounds.csv")
 
     # Wait for a second
-    #time.sleep(1)
+    time.sleep(1)
 
 
     # ----- Model training -----
     # Train the model
-    #backend.trainer.train_model("Hand/Backend/Resources/normalized_data.csv", "Resources/Data/model.h5")
+    backend.trainer.train_model("Hand/Backend/Resources/normalized_data.csv", "Hand/Backend/Resources/model.h5")
 
     # Wait for a second
-    #time.sleep(1)
+    time.sleep(1) """
 
 
     # ----- Gesture Predicting -----
