@@ -1,0 +1,23 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : Project [ArmbandControllerHardware_RevA.PrjPcb]
+   Generated File[ArmbandControllerHardware PCB_RevA.TXT]
+   Generated File[ArmbandControllerHardware PCB_RevA.DRL]
+   Generated File[ArmbandControllerHardware PCB_RevA.TX1]
+   Generated File[ArmbandControllerHardware PCB_RevA.DR1]
+   Generated File[ArmbandControllerHardware PCB_RevA.TX2]
+   Generated File[ArmbandControllerHardware PCB_RevA.DR2]
+   Generated File[ArmbandControllerHardware PCB_RevA.TX3]
+   Generated File[ArmbandControllerHardware PCB_RevA.DR3]
+   Generated File[ArmbandControllerHardware PCB_RevA.TX4]
+   Generated File[ArmbandControllerHardware PCB_RevA.DR4]
+   Generated File[ArmbandControllerHardware PCB_RevA.TX5]
+   Generated File[ArmbandControllerHardware PCB_RevA.DR5]
+   Generated File[ArmbandControllerHardware PCB_RevA.LDP]
+   Generated File[ArmbandControllerHardware PCB_RevA.DRR]
+
+
+Files Generated   : 14
+Documents Printed : 0
+
+Finished Output Generation At 10:14:12 On 25/10/2024

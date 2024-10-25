@@ -1,0 +1,66 @@
+----------------------------------------------------------------------------------------------------------------------------------
+NCDrill File Report For: ArmbandControllerHardware PCB_RevA.PcbDoc   25/10/2024  10:14:11
+----------------------------------------------------------------------------------------------------------------------------------
+
+Layer Pair : Sig 1 to Sig 3
+ASCII RoundHoles File : ArmbandControllerHardware PCB_RevA.TXT
+EIA File   : ArmbandControllerHardware PCB_RevA.DRL
+
+Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
+----------------------------------------------------------------------------------------------------------------------------------
+T1      8mil (0.201mm)                                            Round             50        PTH        2.95inch (74.90mm)
+T2      10mil (0.254mm)                                           Round             44        PTH        7.17inch (182.18mm)
+T3      28mil (0.711mm)                                           Round             2         PTH        0.25inch (6.37mm)
+T4      40mil (1.021mm)                                           Round             2         PTH        0.10inch (2.54mm)
+T5      145mil (3.683mm)                                          Round             1         PTH        0.00inch (0.00mm)
+----------------------------------------------------------------------------------------------------------------------------------
+Totals                                                                              99
+Layer Pair : Sig 1 to Sig 2
+ASCII RoundHoles File : ArmbandControllerHardware PCB_RevA.TX1
+EIA File   : ArmbandControllerHardware PCB_RevA.DR1
+
+Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
+----------------------------------------------------------------------------------------------------------------------------------
+T2      10mil (0.254mm)                                           Round             2         PTH        0.05inch (1.14mm)
+----------------------------------------------------------------------------------------------------------------------------------
+Totals                                                                              2
+Layer Pair : Sig 1 to PWR (3V3)
+ASCII RoundHoles File : ArmbandControllerHardware PCB_RevA.TX2
+EIA File   : ArmbandControllerHardware PCB_RevA.DR2
+
+Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
+----------------------------------------------------------------------------------------------------------------------------------
+T3      28mil (0.711mm)                                           Round             1         PTH        0.00inch (0.00mm)
+----------------------------------------------------------------------------------------------------------------------------------
+Totals                                                                              1
+Layer Pair : Sig 2 to Sig 3
+ASCII RoundHoles File : ArmbandControllerHardware PCB_RevA.TX3
+EIA File   : ArmbandControllerHardware PCB_RevA.DR3
+
+Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
+----------------------------------------------------------------------------------------------------------------------------------
+T2      10mil (0.254mm)                                           Round             2         PTH        0.10inch (2.54mm)
+----------------------------------------------------------------------------------------------------------------------------------
+Totals                                                                              2
+Layer Pair : PWR (3V3) to Sig 3
+ASCII RoundHoles File : ArmbandControllerHardware PCB_RevA.TX4
+EIA File   : ArmbandControllerHardware PCB_RevA.DR4
+
+Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
+----------------------------------------------------------------------------------------------------------------------------------
+T2      10mil (0.254mm)                                           Round             5         PTH        1.79inch (45.43mm)
+----------------------------------------------------------------------------------------------------------------------------------
+Totals                                                                              5
+Layer Pair : GND 2 to Sig 3
+ASCII RoundHoles File : ArmbandControllerHardware PCB_RevA.TX5
+EIA File   : ArmbandControllerHardware PCB_RevA.DR5
+
+Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
+----------------------------------------------------------------------------------------------------------------------------------
+T2      10mil (0.254mm)                                           Round             1         PTH        0.00inch (0.00mm)
+----------------------------------------------------------------------------------------------------------------------------------
+Totals                                                                              1
+----------------------------------------------------------------------------------------------------------------------------------
+Totals                                                                              110
+
+Total Processing Time (hh:mm:ss) : 00:00:00
