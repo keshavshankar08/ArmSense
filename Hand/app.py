@@ -16,21 +16,41 @@ controller_backend = ControllerBackend()
 # Initialize serial communication
 ser = serial.Serial('/dev/tty.usbserial-0001', 115200)
 
-def read_serial_data():
-    while True: # keep reading data from the serial port
-        line = ser.readline().decode('utf-8').strip()
-        print(f"Raw data from serial: {line}")
-        if line.endswith('.'):
-            data_str = line[:-1]
-            data = data_str.split(',')
-            if len(data) == 8:
-                try:
-                    data = [int(value) for value in data]
-                    print(f"Parsed data: {data}")
-                    socketio.emit('semg_data', {'data': data})
-                except ValueError:
-                    print(f"Error converting data to integers: {data}")
+def decode_with_fallback(raw_line):
+    """
+    Attempt to decode a raw byte line into a UTF-8 string. If any character fails to decode,
+    it will be replaced with '0'.
+    """
+    decoded_chars = []
+    for byte in raw_line:
+        try:
+            decoded_chars.append(chr(byte).encode('utf-8').decode('utf-8'))
+        except UnicodeDecodeError:
+            decoded_chars.append('0')  # Replace invalid byte with '0'
+    return ''.join(decoded_chars)
 
+def read_serial_data():
+    while True:
+        try:
+            raw_line = ser.readline()  # Read raw bytes from serial
+            line = decode_with_fallback(raw_line).strip()  # Use fallback decoding
+            print(f"Raw data from serial: {line}")
+            if line.endswith('.'):
+                data_str = line[:-1]  # Remove trailing period
+                data = data_str.split(',')
+                if len(data) == 8:
+                    try:
+                        data = [int(value) for value in data]  # Convert each element to an integer
+                        print(f"Parsed data: {data}")
+                        socketio.emit('semg_data', {'data': data})  # Emit parsed data to frontend
+                    except ValueError:
+                        print(f"Error converting data to integers: {data}")
+        except serial.SerialException as e:
+            print(f"Serial port error: {e}")
+            time.sleep(1)  # Wait and retry
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            
 # SocketIO event handlers
 @socketio.on('connect')
 def handle_connect():

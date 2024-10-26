@@ -6,13 +6,14 @@
     <title>sEMG Signal Display</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>sEMG Signal Display</h1>
         
         <div id="semgContainer">
+            <!-- Dynamically created charts for each channel -->
             <div class="semgWindow"><canvas id="semgChart0"></canvas></div>
             <div class="semgWindow"><canvas id="semgChart1"></canvas></div>
             <div class="semgWindow"><canvas id="semgChart2"></canvas></div>
@@ -34,18 +35,19 @@
 
     <script>
         const socket = io.connect('http://localhost:5001');
-
+    
         socket.on('connect', () => {
             console.log('Connected to SocketIO server');
         });
-
+    
         socket.on('disconnect', () => {
             console.log('Disconnected from SocketIO server');
         });
-
+    
         const charts = [];
         const dataLength = 100; // Number of data points to display
-
+    
+        // Initialize charts for 8 channels
         for (let i = 0; i < 8; i++) {
             const canvas = document.getElementById(`semgChart${i}`);
             if (!canvas) {
@@ -56,48 +58,61 @@
             charts[i] = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: Array(dataLength).fill(''),
+                    labels: Array(dataLength).fill(''), // Empty labels, only showing data points
                     datasets: [{
                         label: `Channel ${i + 1}`,
-                        data: Array(dataLength).fill(0),
+                        data: Array(dataLength).fill(0), // Initialize with 0s
                         borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1,
-                        pointRadius: 0, // Hide data points
+                        pointRadius: 0, // Hide individual data points
                         fill: false
                     }]
                 },
                 options: {
-                    animation: false,
+                    animation: false, // Disable animation for real-time update
                     scales: {
-                        x: { display: false },
+                        x: { display: false }, // Hide x-axis labels
                         y: { beginAtZero: true }
                     },
                     elements: {
-                        line: { tension: 0 } // No line smoothing
+                        line: { tension: 0 } // Straight lines (no smoothing)
                     }
                 }
             });
         }
-
+    
+        // Listen for sEMG data from the server
         socket.on('semg_data', function(msg) {
             console.log('Received semg_data:', msg);
-            const data = msg.data; // data should be an array of 8 values
-            if (Array.isArray(data)) {
+            const data = msg.data; // Data should be an array of 8 values
+            if (Array.isArray(data) && data.length === 8) {
                 data.forEach((value, index) => {
-                    console.log(`Updating chart ${index} with value ${value}`);
+                    console.log(`Updating chart ${index + 1} with value ${value}`);
                     const chart = charts[index];
                     if (chart) {
-                        chart.data.datasets[0].data.push(value);
+                        chart.data.datasets[0].data.push(value); // Add new data point for the specific chart
                         if (chart.data.datasets[0].data.length > dataLength) {
-                            chart.data.datasets[0].data.shift();
+                            chart.data.datasets[0].data.shift(); // Remove the oldest data point
                         }
-                        chart.update('none'); // Update chart without animation
+                        chart.update('none'); // Update chart without animation for real-time effect
                     }
                 });
             } else {
-                console.error('Data received is not an array:', data);
+                console.error('Data received is not an array of 8 values:', data);
             }
         });
+    
+        function trainModel() {
+            // Dummy function for training model
+            console.log('Training model...');
+        }
+    
+        function evaluateModel() {
+            // Dummy function for evaluating model
+            console.log('Evaluating model...');
+        }
     </script>
+    
+
 </body>
 </html>
