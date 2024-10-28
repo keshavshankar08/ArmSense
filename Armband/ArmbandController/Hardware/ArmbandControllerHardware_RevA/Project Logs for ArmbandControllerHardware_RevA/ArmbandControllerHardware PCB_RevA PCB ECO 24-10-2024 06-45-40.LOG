@@ -1,0 +1,7 @@
+Removed Pin From Net: NetName=GPIO0 Pin=J1-01_1
+Removed Pin From Net: NetName=GPIO2 Pin=J1-01_2
+Added Pin To Net: NetName=GPIO2 Pin=J1-01_1
+Added Pin To Net: NetName=GPIO0 Pin=J1-01_2
+Added Rule: Name=Schematic Supply Nets
+Added Rule: Name=Schematic Supply Nets_1
+Added Rule: Name=Schematic Supply Nets_2
