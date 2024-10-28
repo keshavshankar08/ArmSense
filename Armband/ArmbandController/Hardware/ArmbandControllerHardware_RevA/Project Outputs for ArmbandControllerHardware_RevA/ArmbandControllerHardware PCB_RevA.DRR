@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------------------------------------------------------------
-NCDrill File Report For: ArmbandControllerHardware PCB_RevA.PcbDoc   25/10/2024  10:14:11
+NCDrill File Report For: ArmbandControllerHardware PCB_RevA.PcbDoc   27/10/2024  19:34:01
 ----------------------------------------------------------------------------------------------------------------------------------
 
 Layer Pair : Sig 1 to Sig 3
@@ -9,12 +9,12 @@ EIA File   : ArmbandControllerHardware PCB_RevA.DRL
 Tool       Hole Size               Hole Tolerance               Hole Type       Hole Count   Plated         Tool Travel
 ----------------------------------------------------------------------------------------------------------------------------------
 T1      8mil (0.201mm)                                            Round             50        PTH        2.95inch (74.90mm)
-T2      10mil (0.254mm)                                           Round             44        PTH        7.17inch (182.18mm)
+T2      10mil (0.254mm)                                           Round             45        PTH        6.99inch (177.48mm)
 T3      28mil (0.711mm)                                           Round             2         PTH        0.25inch (6.37mm)
 T4      40mil (1.021mm)                                           Round             2         PTH        0.10inch (2.54mm)
 T5      145mil (3.683mm)                                          Round             1         PTH        0.00inch (0.00mm)
 ----------------------------------------------------------------------------------------------------------------------------------
-Totals                                                                              99
+Totals                                                                              100
 Layer Pair : Sig 1 to Sig 2
 ASCII RoundHoles File : ArmbandControllerHardware PCB_RevA.TX1
 EIA File   : ArmbandControllerHardware PCB_RevA.DR1
@@ -61,6 +61,6 @@ T2      10mil (0.254mm)                                           Round         
 ----------------------------------------------------------------------------------------------------------------------------------
 Totals                                                                              1
 ----------------------------------------------------------------------------------------------------------------------------------
-Totals                                                                              110
+Totals                                                                              111
 
 Total Processing Time (hh:mm:ss) : 00:00:00
