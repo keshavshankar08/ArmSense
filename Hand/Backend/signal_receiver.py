@@ -5,6 +5,10 @@ import serial, threading, time, logging
 from collections import deque
 import numpy as np
 
+# Bluetooth imports
+from bleak import BleakClient
+import asyncio
+
 class SignalReceiver:
     def __init__(self):
         """
@@ -16,16 +20,30 @@ class SignalReceiver:
         self.running = False
         self.thread = None
 
-    def connect(self, port, baud_rate):
+        self.bt_address = "D8:13:2A:7F:2F:FE"
+        self.CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+        self.client = BleakClient(self.bt_address)
+
+
+    def connect(self):
         """
         Connects to the serial port.
         """
-        try:
-            self.device = serial.Serial(port, baud_rate, timeout=1)
-            logging.info(f"Connected to serial port {port} at {baud_rate} baud.")
-        except serial.SerialException as e:
-            logging.error(f"Failed to connect to serial port {port}: {e}")
-            raise e
+        # try:
+        #     self.device = serial.Serial(port, baud_rate, timeout=1)
+        #     logging.info(f"Connected to serial port {port} at {baud_rate} baud.")
+        # except serial.SerialException as e:
+        #     logging.error(f"Failed to connect to serial port {port}: {e}")
+        #     raise e
+
+        # try:
+        #     await self.client.connect()
+        #     print(f"Connected to {self.bt_address}")
+        # except Exception as e:
+        #     print(f"Failed to connect: {e}")
+
+        self.running = True
+        asyncio.run(self.start_bluetooth_recieve())
         
     def disconnect(self):
         """
@@ -41,41 +59,56 @@ class SignalReceiver:
         """
         Starts the signal reception thread.
         """
+        # self.running = True
+        # logging.info("SignalReceiver thread started.")
+
+        # async def start_listening():
+        #     # Start receiving notifications
+        #     await self.client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
+        #     await self.client.stop_notify(self.CHARACTERISTIC_UUID)
+
+        # listen_loop = asyncio.new_event_loop()
+        # asyncio.set_event_loop(listen_loop)
+
+        # try:
+        #     listen_loop.run_until_complete(start_listening())
+        # finally:
+        #     listen_loop.close()
         self.running = True
-        self.thread = threading.Thread(target=self.receive_signals, args=(sampling_rate,), daemon=True)
-        self.thread.start()  
-        logging.info("SignalReceiver thread started.")
+        bt_recieve_thread = threading.Thread(target=self.connect)
+        bt_recieve_thread.start()
+            
+
 
     def stop_reception(self):
         """
         Stops the signal reception thread.
         """
-        self.running = False
-        if self.thread:
-            self.thread.join()
-        self.device.close()
+        # self.running = False
+        # if self.thread:
+        #     self.thread.join()
+        # self.device.close()
         logging.info("SignalReceiver thread stopped and serial port closed.")
 
-    def receive_signals(self, sampling_rate):
+    def receive_signals(self, sender, data):
         """
         Continuously reads signals from the serial port at the specified rate.
         """
-        read_interval = 1.0 / sampling_rate
+        read_interval = 1.0 / 1000
 
-        while self.running:
+        if self.running:
             start_time = time.time()
             try:
-                line = self.device.read_until(b'.').decode('utf-8').strip('.')
+                line = data.decode('utf-8').strip('.').rstrip(',')
                 if line:
                     parts = line.split('.')[0].split(',')
                     if len(parts) != 8:
                         logging.warning(f"Incorrect data form received: {line}")
-                        continue
+
                     try:
                         signal = [int(part) for part in parts]
                     except ValueError:
                         logging.warning(f"Non-integer value encountered in data: {line}")
-                        continue
 
                     if None not in signal:
                         with self.buffer_lock:
@@ -105,3 +138,18 @@ class SignalReceiver:
                 return np.array(list(self.signal_buffer)[-n:])
             else:
                 return None
+            
+
+    async def start_bluetooth_recieve(self):
+        async with BleakClient(self.bt_address) as client:
+            if client.is_connected:
+                print(f"Connected to {self.bt_address}")
+
+                # Start receiving notifications
+                await client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
+
+                # Keep the program running to continuously receive data
+                await asyncio.sleep(6)  # Adjust the time as needed
+
+                # Stop receiving notifications
+                # await client.stop_notify(self.CHARACTERISTIC_UUID)
