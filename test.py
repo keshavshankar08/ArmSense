@@ -26,8 +26,8 @@ if __name__ == '__main__':
     backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
 
     # Start a data collection phase for "fist" gesture, lasting 3 seconds
-    backend.data_collector.start_collection(1, 100, 0.2, 0.05)
-    time.sleep(3)
+    backend.data_collector.start_collection(1, 100, 0.2, 0.05) 
+    time.sleep(3) #wait 3 seconds
     backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
 
     # Wait for a second

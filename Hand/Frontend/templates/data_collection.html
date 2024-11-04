@@ -24,6 +24,18 @@
             font-size: 18px;
             margin-top: 20px;
         }
+        #startButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #startButton:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -35,16 +47,17 @@
             <img id="fistImage" src="{{ url_for('static', filename='fist_image.jpg') }}" alt="Person making a fist">
             <div id="counter">Repetitions: <span id="repCount">0</span>/3</div>
             <div id="message"></div>
-            <button id="startButton" onclick="startCollection()">Start</button>
+            <button id="startButton" onclick="startRepetitions()">Start</button>
         </div>
     </div>
 
     <script>
         let repCount = 0;
         const totalReps = 3;
-        const collectionDuration = 1000; 
+        const gestureLabel = 1;  // Gesture label for 'Fist'
+        const duration = 3;      // Duration for each data collection in seconds
 
-        function startCollection() {
+        function startRepetitions() {
             document.getElementById('startButton').style.display = 'none';
             collectData();
         }
@@ -54,25 +67,58 @@
                 repCount++;
                 document.getElementById('repCount').textContent = repCount;
                 document.getElementById('message').textContent = "Make a fist now!";
-                
-                setTimeout(() => {
-                    document.getElementById('message').textContent = "Relax your hand.";
-                    
-                    setTimeout(() => {
-                        if (repCount < totalReps) {
-                            document.getElementById('message').textContent = "Prepare for next repetition...";
-                            setTimeout(collectData, 2000);
-                        } else {
-                            finishCollection();
-                        }
-                    }, 2000);
-                }, collectionDuration);
+
+                // Send request to start data collection
+                fetch('/start_data_collection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        gesture_label: gestureLabel
+                    })
+                }).then(response => response.json())
+                  .then(data => {
+                    if (data.success) {
+                        // Wait for the duration of data collection
+                        setTimeout(() => {
+                            document.getElementById('message').textContent = "Relax your hand.";
+
+                            // Send request to stop data collection
+                            fetch('/stop_data_collection', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                }
+                            }).then(response => response.json())
+                              .then(data => {
+                                if (data.success) {
+                                    setTimeout(() => {
+                                        if (repCount < totalReps) {
+                                            document.getElementById('message').textContent = "Prepare for next repetition...";
+                                            setTimeout(collectData, 2000);
+                                        } else {
+                                            finishCollection();
+                                        }
+                                    }, 2000);
+                                } else {
+                                    console.error('Failed to stop data collection:', data.error);
+                                }
+                            })
+                            .catch(error => console.error('Error stopping data collection:', error));
+
+                        }, duration * 1000); // Wait for data collection duration
+                    } else {
+                        console.error('Failed to start data collection:', data.error);
+                    }
+                })
+                .catch(error => console.error('Error starting data collection:', error));
             }
         }
 
         function finishCollection() {
             document.getElementById('message').textContent = "Data collection complete!";
-
+            // Redirect to next gesture
             setTimeout(() => {
                 window.location.href = "{{ url_for('peace_sign') }}";
             }, 3000);
@@ -80,5 +126,3 @@
     </script>
 </body>
 </html>
-```
-</rewritten_file>

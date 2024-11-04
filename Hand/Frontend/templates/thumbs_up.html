@@ -54,10 +54,21 @@
                 repCount++;
                 document.getElementById('repCount').textContent = repCount;
                 document.getElementById('message').textContent = "Give a thumbs up now!";
-                
+
+                // Simulate data collection by sending gesture label to the server
+                fetch('/collect_gesture_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        gesture_label: 4  // Gesture label for 'Thumbs Up'
+                    })
+                });
+
                 setTimeout(() => {
                     document.getElementById('message').textContent = "Relax your hand.";
-                    
+
                     setTimeout(() => {
                         if (repCount < totalReps) {
                             document.getElementById('message').textContent = "Prepare for next repetition...";
@@ -72,12 +83,26 @@
 
         function finishCollection() {
             document.getElementById('message').textContent = "Data collection complete!";
-            setTimeout(() => {
-                window.location.href = "{{ url_for('collection') }}";
-            }, 3000);
+            // Add a Stop Collection button
+            const stopButton = document.createElement('button');
+            stopButton.textContent = 'Stop Collection';
+            stopButton.onclick = stopCollection;
+            document.querySelector('.instruction-container').appendChild(stopButton);
+        }
+
+        function stopCollection() {
+            // Send stop signal to the server
+            fetch('/stop_collection', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect back to collection page
+                    window.location.href = "{{ url_for('collection') }}";
+                }
+            });
         }
     </script>
 </body>
 </html>
-```
-</rewritten_file>
