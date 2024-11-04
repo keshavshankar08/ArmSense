@@ -1,9 +1,10 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 import random
 import logging
+import sys 
+sys.path.append('.')
 from logging.handlers import RotatingFileHandler
-
-app = Flask(__name__)
+app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
 
 # Set up logging
 handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=1)
@@ -16,6 +17,7 @@ app.logger.setLevel(logging.DEBUG)
 @app.route('/')
 def index():
     app.logger.info('Rendering index page')
+    print("Index page rendered")
     return render_template('index.html')
 
 @app.route('/pair', methods=['POST'])
