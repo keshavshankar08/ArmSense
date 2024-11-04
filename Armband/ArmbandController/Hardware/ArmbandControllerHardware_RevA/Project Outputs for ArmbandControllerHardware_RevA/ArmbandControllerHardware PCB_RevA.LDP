@@ -1,7 +1,0 @@
-Layer Pairs Export File for PCB: D:\github\ArmSense\Armband\ArmbandController\Hardware\ArmbandControllerHardware_RevA\ArmbandControllerHardware PCB_RevA.PcbDoc
-LayersSetName=Top_Bot_Thru_Holes|DrillFile=armbandcontrollerhardware pcb_reva.txt|DrillLayers=gtl,g1,g2,g3,g4,gbl
-LayersSetName=Sig 1_Sig 2_Blind_Vias|DrillFile=armbandcontrollerhardware pcb_reva.tx1|DrillLayers=gtl,g1,g2
-LayersSetName=Sig 1_PWR (3V3)_Blind_Vias|DrillFile=armbandcontrollerhardware pcb_reva.tx2|DrillLayers=gtl,g1,g2,g3
-LayersSetName=Sig 2_Sig 3_Blind_Vias|DrillFile=armbandcontrollerhardware pcb_reva.tx3|DrillLayers=g2,g3,g4,gbl
-LayersSetName=PWR (3V3)_Sig 3_Blind_Vias|DrillFile=armbandcontrollerhardware pcb_reva.tx4|DrillLayers=g3,g4,gbl
-LayersSetName=GND 2_Sig 3_Blind_Vias|DrillFile=armbandcontrollerhardware pcb_reva.tx5|DrillLayers=g4,gbl

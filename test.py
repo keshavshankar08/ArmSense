@@ -10,10 +10,12 @@ if __name__ == '__main__':
     backend = be.ControllerBackend()
 
     # Connect to the serial port
-    backend.signal_receiver.connect('/dev/tty.usbserial-0001', 115200)
+    # backend.signal_receiver.connect('/dev/tty.usbserial-0001', 115200)
+    backend.signal_receiver.connect()
+    time.sleep(5)
 
     # Start receiving signals
-    backend.signal_receiver.start_reception(100)
+    # backend.signal_receiver.start_reception(100)
 
     # Wait for a second
     time.sleep(1)

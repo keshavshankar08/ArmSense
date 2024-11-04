@@ -1,4 +1,0 @@
-Change Component Designator: OldDesignator=Batt In NewDesignator=Batt In1
-Change Component Designator: OldDesignator=Conn1 NewDesignator=*1
-Change Component Designator: OldDesignator=S1 NewDesignator=EN1
-Change Net Name : Old Net Name=NetR20_1 New Net Name=NetEN1_3

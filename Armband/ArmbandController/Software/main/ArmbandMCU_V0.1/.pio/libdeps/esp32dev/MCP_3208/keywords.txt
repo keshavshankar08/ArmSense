@@ -1,6 +1,0 @@
-MCP3208               KEYWORD1
-
-begin                 KEYWORD2
-analogRead            KEYWORD2
-analogReadResolution  KEYWORD2
-
