@@ -28,7 +28,7 @@ collecting_data = False
 def collect_serial_data():
     """Function to collect serial data and send it via WebSocket."""
     while collecting_data:
-        data = controller_backend.signal_receiver.get_last_n_signals(1)  # Ensure get_latest_data is implemented
+        data = controller_backend.signal_receiver.get_last_n_signals()  # Ensure get_latest_data is implemented
         if data and len(data) == 1:
             socketio.emit('semg_data', {'data': data})
         time.sleep(0.1)  # Adjust based on real-time needs
@@ -63,17 +63,23 @@ def decode_with_fallback(raw_line):
 def read_serial_data(signal_receiver):
     while True:
         if ser.in_waiting > 0:
-            raw_line = ser.readline()
-            decoded_line = raw_line.decode('utf-8', errors='ignore').strip()
-            if decoded_line:
-                try:
-                    data_values = list(map(int, decoded_line.split(',')))
+            try:
+                raw_line = ser.readline()
+                decoded_line = raw_line.decode('utf-8', errors='ignore').strip()
+                if decoded_line:
+                    # Debug log
+                    print(f"Received serial data: {decoded_line}")
+                    
+                    data_values = [int(x) for x in decoded_line.split(',') if x.strip()]
                     if len(data_values) == 8:
-                        with signal_receiver.buffer_lock:
-                            signal_receiver.signal_buffer.append(data_values)
-                        print(f"Appended signal: {data_values}")
-                except ValueError:
-                    print(f"Invalid data received: {decoded_line}")
+                        # Debug log
+                        print(f"Emitting data: {data_values}")
+                        
+                        socketio.emit('semg_data', {'data': data_values})
+                    else:
+                        print(f"Invalid data length: {len(data_values)}")
+            except Exception as e:
+                print(f"Error processing serial data: {e}")
         time.sleep(0.01)
 
 # Flask routes
@@ -163,4 +169,4 @@ def handle_stop_data_collection():
 if __name__ == '__main__':
     # Start the serial reading in a background thread
     socketio.start_background_task(read_serial_data, controller_backend.signal_receiver)
-    socketio.run(app, host='0.0.0.0', port=5000)
+    socketio.run(app, host='0.0.0.0', port=5001)

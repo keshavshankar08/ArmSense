@@ -83,23 +83,28 @@
     
         // Listen for sEMG data from the server
         socket.on('semg_data', function(msg) {
-            console.log('Received semg_data:', msg);
-            const data = msg.data; // Data should be an array of 8 values
-            if (Array.isArray(data) && data.length === 8) {
-                data.forEach((value, index) => {
-                    console.log(`Updating chart ${index + 1} with value ${value}`);
-                    const chart = charts[index];
-                    if (chart) {
-                        chart.data.datasets[0].data.push(value); // Add new data point for the specific chart
-                        if (chart.data.datasets[0].data.length > dataLength) {
-                            chart.data.datasets[0].data.shift(); // Remove the oldest data point
-                        }
-                        chart.update('none'); // Update chart without animation for real-time effect
-                    }
-                });
-            } else {
-                console.error('Data received is not an array of 8 values:', data);
+            console.log('Received data:', msg); // Debug log
+            
+            if (!msg.data || !Array.isArray(msg.data) || msg.data.length !== 8) {
+                console.error('Invalid data format received:', msg);
+                return;
             }
+            
+            msg.data.forEach((value, index) => {
+                const chart = charts[index];
+                if (chart) {
+                    // Add new data point
+                    const numericValue = Number(value);
+                    console.log(`Channel ${index}: ${numericValue}`); // Debug log
+                    chart.data.datasets[0].data.push(numericValue);
+                    // Remove oldest data point if we exceed dataLength
+                    if (chart.data.datasets[0].data.length > dataLength) {
+                        chart.data.datasets[0].data.shift();
+                    }
+                    // Update the chart without animation
+                    chart.update('none');
+                }
+            });
         });
     
         function trainModel() {

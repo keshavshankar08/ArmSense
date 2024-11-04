@@ -67,6 +67,7 @@
                 repCount++;
                 document.getElementById('repCount').textContent = repCount;
                 document.getElementById('message').textContent = "Make a fist now!";
+                collectData();
 
                 // Send request to start data collection
                 fetch('/start_data_collection', {
