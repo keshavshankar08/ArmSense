@@ -2,6 +2,10 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for
 import random
 import logging
 import sys 
+import serial
+import time
+from threading import Thread
+from collections import deque
 sys.path.append('.')
 from logging.handlers import RotatingFileHandler
 app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
@@ -13,6 +17,41 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 app.logger.setLevel(logging.DEBUG)
+
+# Serial port configuration
+SERIAL_PORT = '/dev/cu.usbserial-0001'
+BAUD_RATE = 115200
+
+# Buffer to store the latest data
+data_buffers = [deque(maxlen=100) for _ in range(8)]
+
+def read_serial_data():
+    try:
+        ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+        while True:
+            line = ser.readline().decode('utf-8', errors='ignore').strip()
+            if line:
+                #print(f"Raw data received: {line}")  # Debugging output
+                values = line.split(',')
+                if len(values) == 8:
+                    try:
+                        for i, value in enumerate(values):
+                            data_buffers[i].append(float(value))
+                    except ValueError as e:
+                        print(f"Error converting value to float: {value} - {e}")
+                else:
+                    print(f"Unexpected number of values: {len(values)} - {values}")
+            time.sleep(0.01)  # Small delay to prevent high CPU usage
+    except serial.SerialException as e:
+        print(f"Error reading from serial port: {e}")
+    finally:
+        if 'ser' in locals() and ser.is_open:
+            ser.close()
+
+# Start the background thread to read serial data
+serial_thread = Thread(target=read_serial_data)
+serial_thread.daemon = True
+serial_thread.start()
 
 @app.route('/')
 def index():
@@ -53,9 +92,8 @@ def evaluate():
 
 @app.route('/get_semg_data')
 def get_semg_data():
-    app.logger.info('Generating sEMG data')
-    # Generate dummy sEMG data
-    data = [[random.uniform(-1, 1) for _ in range(100)] for _ in range(8)]
+    # Prepare data to send to client
+    data = [list(buffer) for buffer in data_buffers]
     return jsonify({'data': data})
 
 @app.route('/log', methods=['POST'])
