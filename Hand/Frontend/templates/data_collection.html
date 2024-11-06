@@ -85,11 +85,11 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 'gesture_class': 0 })
             });
-
+            
             // Stop data collection after 3 seconds
             setTimeout(function() {
                 fetch('/stop_collection', { method: 'POST' });
-            }, 3000);
+            }, 10000);
         }
 
         window.onload = startDataCollection;

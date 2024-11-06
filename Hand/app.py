@@ -176,7 +176,7 @@ def start_collection():
 @app.route('/stop_collection', methods=['POST'])
 def stop_collection():
     # Stop data collection and save data
-    backend.data_collector.stop_collection("Backend/Resources/data.csv")
+    backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
     return jsonify({'success': True})
 
 if __name__ == '__main__':
