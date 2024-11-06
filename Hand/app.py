@@ -11,7 +11,6 @@ sys.path.append(os.path.abspath('Backend'))
 from logging.handlers import RotatingFileHandler
 from Backend.controller_backend import ControllerBackend
 from Backend.signal_receiver import SignalReceiver
-# signal_receiver = SignalReceiver()
 
 app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
 backend = ControllerBackend()
