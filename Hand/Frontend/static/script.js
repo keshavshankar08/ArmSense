@@ -12,8 +12,14 @@ function log(functionName, purpose, error = null) {
 document.addEventListener('DOMContentLoaded', () => {
     try {
         const pairButton = document.getElementById('pairButton');
+        const findDevicesButton = document.getElementById('findDevicesButton');
+
         if (pairButton) {
             pairButton.addEventListener('click', pairArmband);
+        }
+
+        if (findDevicesButton) {
+            findDevicesButton.addEventListener('click', findDevices);
         }
 
         if (window.location.pathname === '/collection') {
@@ -205,4 +211,24 @@ function collectData() {
     } catch (error) {
         log('collectData', 'Unexpected error', error);
     }
+}
+
+function findDevices() {
+    log('findDevices', 'Finding Bluetooth devices');
+    // Implement Bluetooth device discovery logic here
+    // This might involve calling a backend endpoint to start the Bluetooth scan
+    fetch('/find_devices', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                log('findDevices', 'Devices found successfully');
+                alert('Devices found successfully.');
+            } else {
+                log('findDevices', 'Failed to find devices');
+                alert('Failed to find devices. Please try again.');
+            }
+        })
+        .catch(error => {
+            log('findDevices', 'Error finding devices', error);
+        });
 }
