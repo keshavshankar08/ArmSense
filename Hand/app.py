@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath('Backend'))
 from logging.handlers import RotatingFileHandler
 from Backend.controller_backend import ControllerBackend
 from Backend.signal_receiver import SignalReceiver
-signal_receiver = SignalReceiver()
+# signal_receiver = SignalReceiver()
 
 app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
 backend = ControllerBackend()
@@ -36,39 +36,39 @@ def find_devices():
     # Logic to find Bluetooth devices
     # This could involve starting the Bluetooth connection process
     try:
-        signal_receiver.connect()  # Start Bluetooth connection
+        backend.signal_receiver.connect()  # Start Bluetooth connection
         return jsonify({'success': True})
     except Exception as e:
         app.logger.error(f"Error finding devices: {e}")
         return jsonify({'success': False, 'error': str(e)})
     
-def read_serial_data():
-    try:
-        ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-        while True:
-            line = ser.readline().decode('utf-8', errors='ignore').strip()
-            if line:
-                #print(f"Raw data received: {line}")  # Debugging output
-                values = line.split(',')
-                if len(values) == 8:
-                    try:
-                        for i, value in enumerate(values):
-                            data_buffers[i].append(float(value))
-                    except ValueError as e:
-                        print(f"Error converting value to float: {value} - {e}")
-                else:
-                    print(f"Unexpected number of values: {len(values)} - {values}")
-            time.sleep(0.01)  # Small delay to prevent high CPU usage
-    except serial.SerialException as e:
-        print(f"Error reading from serial port: {e}")
-    finally:
-        if 'ser' in locals() and ser.is_open:
-            ser.close()
+# def read_serial_data():
+#     try:
+#         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+#         while True:
+#             line = ser.readline().decode('utf-8', errors='ignore').strip()
+#             if line:
+#                 #print(f"Raw data received: {line}")  # Debugging output
+#                 values = line.split(',')
+#                 if len(values) == 8:
+#                     try:
+#                         for i, value in enumerate(values):
+#                             data_buffers[i].append(float(value))
+#                     except ValueError as e:
+#                         print(f"Error converting value to float: {value} - {e}")
+#                 else:
+#                     print(f"Unexpected number of values: {len(values)} - {values}")
+#             time.sleep(0.01)  # Small delay to prevent high CPU usage
+#     except serial.SerialException as e:
+#         print(f"Error reading from serial port: {e}")
+#     finally:
+#         if 'ser' in locals() and ser.is_open:
+#             ser.close()
 
 # Start the background thread to read serial data
-serial_thread = Thread(target=read_serial_data)
-serial_thread.daemon = True
-serial_thread.start()
+# serial_thread = Thread(target=read_serial_data)
+# serial_thread.daemon = True
+# serial_thread.start()
 
 @app.route('/')
 def index():
@@ -79,8 +79,18 @@ def index():
 @app.route('/pair', methods=['POST'])
 def pair():
     app.logger.info('Attempting to pair armband')
+    try:
+        backend.signal_receiver.connect()  # Start Bluetooth connection
+        time.sleep(10)
+        # print(backend.signal_receiver.get_last_n_signals(2))
+        # return jsonify({'success': True})
+        return jsonify({'success': True, 'redirect': url_for('collection')})
+    except Exception as e:
+        print(f"Error finding devices: {e}")
+        return jsonify({'success': False, 'error': str(e)})
     # Simulate successful pairing
-    return jsonify({'success': True, 'redirect': url_for('collection')})
+    
+    
 
 @app.route('/collection')
 def collection():
@@ -112,7 +122,7 @@ def get_semg_data():
     # # Prepare data to send to client
     # data = [list(buffer) for buffer in data_buffers]
     # return jsonify({'data': data})
-    signals = signal_receiver.get_signals(100)
+    signals = backend.signal_receiver.get_last_n_signals(100)
     if signals is not None:
         data = signals.tolist()
         return jsonify({'data': data})

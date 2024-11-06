@@ -149,7 +149,7 @@ class SignalReceiver:
                 await client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
 
                 # Keep the program running to continuously receive data
-                await asyncio.sleep(6)  # Adjust the time as needed
+                await asyncio.sleep(20)  # Adjust the time as needed
 
                 # Stop receiving notifications
                 # await client.stop_notify(self.CHARACTERISTIC_UUID)
