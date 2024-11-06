@@ -77,8 +77,22 @@
                 window.location.href = "{{ url_for('peace_sign') }}";
             }, 3000);
         }
+
+        function startDataCollection() {
+            // Start data collection for gesture "open" (class 0)
+            fetch('/start_collection', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 'gesture_class': 0 })
+            });
+
+            // Stop data collection after 3 seconds
+            setTimeout(function() {
+                fetch('/stop_collection', { method: 'POST' });
+            }, 3000);
+        }
+
+        window.onload = startDataCollection;
     </script>
 </body>
 </html>
-```
-</rewritten_file>

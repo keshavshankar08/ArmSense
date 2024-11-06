@@ -3,12 +3,18 @@ import random
 import logging
 import sys 
 import serial
+import os
 import time
 from threading import Thread
 from collections import deque
-sys.path.append('.')
+sys.path.append(os.path.abspath('Backend'))
 from logging.handlers import RotatingFileHandler
+from Backend.controller_backend import ControllerBackend
+from Backend.signal_receiver import SignalReceiver
+signal_receiver = SignalReceiver()
+
 app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
+backend = ControllerBackend()
 
 # Set up logging
 handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=1)
@@ -25,6 +31,17 @@ BAUD_RATE = 115200
 # Buffer to store the latest data
 data_buffers = [deque(maxlen=100) for _ in range(8)]
 
+@app.route('/find_devices', methods=['POST'])
+def find_devices():
+    # Logic to find Bluetooth devices
+    # This could involve starting the Bluetooth connection process
+    try:
+        signal_receiver.connect()  # Start Bluetooth connection
+        return jsonify({'success': True})
+    except Exception as e:
+        app.logger.error(f"Error finding devices: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+    
 def read_serial_data():
     try:
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
@@ -92,9 +109,15 @@ def evaluate():
 
 @app.route('/get_semg_data')
 def get_semg_data():
-    # Prepare data to send to client
-    data = [list(buffer) for buffer in data_buffers]
-    return jsonify({'data': data})
+    # # Prepare data to send to client
+    # data = [list(buffer) for buffer in data_buffers]
+    # return jsonify({'data': data})
+    signals = signal_receiver.get_signals(100)
+    if signals is not None:
+        data = signals.tolist()
+        return jsonify({'data': data})
+    else:
+        return jsonify({'data': []})
 
 @app.route('/log', methods=['POST'])
 def log():
@@ -133,6 +156,19 @@ def thumbs_up():
         # Redirect back to collection page
         return redirect(url_for('collection'))
     return render_template('thumbs_up.html')
+
+@app.route('/start_collection', methods=['POST'])
+def start_collection():
+    gesture_class = int(request.json.get('gesture_class'))
+    # Start data collection
+    backend.data_collector.start_collection(gesture_class, 100, 0.2, 0.05)
+    return jsonify({'success': True})
+
+@app.route('/stop_collection', methods=['POST'])
+def stop_collection():
+    # Stop data collection and save data
+    backend.data_collector.stop_collection("Backend/Resources/data.csv")
+    return jsonify({'success': True})
 
 if __name__ == '__main__':
     app.run(debug=True)

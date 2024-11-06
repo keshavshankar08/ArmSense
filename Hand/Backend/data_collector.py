@@ -1,7 +1,7 @@
 import sys
 sys.path.append('.')
 
-from Hand.Backend.feature_extractor import *
+from Backend.feature_extractor import *
 
 from collections import deque
 import time, logging, threading
