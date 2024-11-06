@@ -35,7 +35,10 @@ def find_devices():
     # Logic to find Bluetooth devices
     # This could involve starting the Bluetooth connection process
     try:
-        backend.signal_receiver.connect()  # Start Bluetooth connection
+        # backend.signal_receiver.connect()  # Start Bluetooth connection
+        serial_thread = Thread(target=backend.signal_receiver.connect)
+        serial_thread.start()
+        
         return jsonify({'success': True})
     except Exception as e:
         app.logger.error(f"Error finding devices: {e}")
