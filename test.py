@@ -9,8 +9,7 @@ if __name__ == '__main__':
     # Create backend instance
     backend = be.ControllerBackend()
 
-    # Connect to the serial port
-    # backend.signal_receiver.connect('/dev/tty.usbserial-0001', 115200)
+    # Connect to the device
     backend.signal_receiver.connect()
     time.sleep(5)
 
@@ -63,5 +62,3 @@ if __name__ == '__main__':
     backend.predictor.start_prediction("Hand/Backend/Resources/model.h5", min_vals, max_vals, 100, 0.2, 0.05)
     time.sleep(5)
     backend.predictor.stop_prediction()
-
-

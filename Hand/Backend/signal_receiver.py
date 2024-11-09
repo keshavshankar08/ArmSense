@@ -1,11 +1,9 @@
 import sys
 sys.path.append('.')
 
-import threading, time, logging
+import threading, time
 from collections import deque
 import numpy as np
-
-# Bluetooth imports
 from bleak import BleakClient
 import asyncio
 
@@ -19,7 +17,7 @@ class SignalReceiver:
         self.running = False
         self.thread = None
 
-        self.bt_address = "D8:13:2A:7F:2F:FE"
+        self.bt_address = "76FF84F4-9D42-7F49-B6BB-F2EA5F824A8D"
         self.CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
         self.client = BleakClient(self.bt_address)
 
@@ -29,13 +27,6 @@ class SignalReceiver:
         Connects to the bluetooth device.
         """
         # TODO: Make this method connect to the bluetooth device
-        # try:
-        #     self.device = serial.Serial(port, baud_rate, timeout=1)
-        #     logging.info(f"Connected to serial port {port} at {baud_rate} baud.")
-        # except serial.SerialException as e:
-        #     logging.error(f"Failed to connect to serial port {port}: {e}")
-        #     raise e
-
         # try:
         #     await self.client.connect()
         #     print(f"Connected to {self.bt_address}")
@@ -58,7 +49,6 @@ class SignalReceiver:
         """
         # TODO: Make this method starting receiving the signals
         # self.running = True
-        # logging.info("SignalReceiver thread started.")
 
         # async def start_listening():
         #     # Start receiving notifications
@@ -96,28 +86,23 @@ class SignalReceiver:
                 if line:
                     parts = line.split('.')[0].split(',')
                     if len(parts) != 8:
-                        logging.warning(f"Incorrect data form received: {line}")
+                        return
 
                     try:
                         signal = [int(part) for part in parts]
                     except ValueError:
-                        logging.warning(f"Non-integer value encountered in data: {line}")
+                        return
 
                     if None not in signal:
                         with self.buffer_lock:
                             self.signal_buffer.append(signal)
-                    else:
-                        logging.warning(f"Null value encountered in signal: {signal}")
-                    logging.debug(f"Received signal: {signal}")
             except Exception as e:
-                logging.error(f"Error receiving signals: {e}")
+                return
 
             elapsed_time = time.time() - start_time
             sleep_time = read_interval - elapsed_time
             if sleep_time > 0:
                 time.sleep(sleep_time)
-            else:
-                logging.warning("Signal reception is lagging behind the desired rate.")
 
     def get_last_n_signals(self, n):
         """
