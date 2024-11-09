@@ -54,6 +54,7 @@ class SignalReceiver:
         Stops the signal reception thread.
         """
         #TODO: add a way to stop signal receive and keep the connection alive
+        self.isBTRequested = False
         # logging.info("SignalReceiver thread stopped and serial port closed.")
 
     def receive_signals(self, sender, data):
@@ -116,11 +117,9 @@ class SignalReceiver:
                 await client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
 
             while client.is_connected:
-                # Start receiving notifications
-                # await client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
-
                 # Keep the program running to continuously receive data
                 await asyncio.sleep(0.0001)  # Adjust the time as needed
 
                 # Stop receiving notifications
-                # await client.stop_notify(self.CHARACTERISTIC_UUID)
+                if not self.isBTRequested:
+                    await client.stop_notify(self.CHARACTERISTIC_UUID)
