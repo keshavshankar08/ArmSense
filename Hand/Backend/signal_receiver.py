@@ -1,7 +1,7 @@
 import sys
 sys.path.append('.')
 
-import serial, threading, time, logging
+import threading, time, logging
 from collections import deque
 import numpy as np
 
@@ -14,7 +14,6 @@ class SignalReceiver:
         """
         Initializes the SignalReceiver.
         """
-        self.device = None
         self.signal_buffer = deque(maxlen=1000)
         self.buffer_lock = threading.Lock()
         self.running = False
@@ -27,8 +26,9 @@ class SignalReceiver:
 
     def connect(self):
         """
-        Connects to the serial port.
+        Connects to the bluetooth device.
         """
+        # TODO: Make this method connect to the bluetooth device
         # try:
         #     self.device = serial.Serial(port, baud_rate, timeout=1)
         #     logging.info(f"Connected to serial port {port} at {baud_rate} baud.")
@@ -47,18 +47,16 @@ class SignalReceiver:
         
     def disconnect(self):
         """
-        Disconnects from the serial port.
+        Disconnects from the bluetooth device
         """
-        if self.device:
-            self.device.close()
-            logging.info("Disconnected from serial port.")
-        else:
-            logging.warning("No serial port to disconnect from.")
+        # TODO: Make this method disconnect from the bluetooth device
+        pass
 
     def start_reception(self, sampling_rate):
         """
         Starts the signal reception thread.
         """
+        # TODO: Make this method starting receiving the signals
         # self.running = True
         # logging.info("SignalReceiver thread started.")
 
@@ -78,21 +76,16 @@ class SignalReceiver:
         bt_recieve_thread = threading.Thread(target=self.connect)
         bt_recieve_thread.start()
             
-
-
     def stop_reception(self):
         """
         Stops the signal reception thread.
         """
-        # self.running = False
-        # if self.thread:
-        #     self.thread.join()
-        # self.device.close()
-        logging.info("SignalReceiver thread stopped and serial port closed.")
+        # TODO: Make this method stop receiving the signals
+        pass
 
     def receive_signals(self, sender, data):
         """
-        Continuously reads signals from the serial port at the specified rate.
+        Continuously reads signals from the device.
         """
         read_interval = 1.0 / 1000
 

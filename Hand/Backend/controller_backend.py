@@ -10,7 +10,7 @@ from Hand.Backend.feature_extractor import *
 class ControllerBackend:
     def __init__(self):
         '''
-        Initialize the ControllerBackend with the given sampling rate, window size, and interval size.
+        Initializes the ControllerBackend.
         '''
         self.signal_receiver = SignalReceiver()
         self.data_collector = DataCollector(self.signal_receiver)
