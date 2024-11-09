@@ -23,25 +23,14 @@ class SignalReceiver:
         self.bt_address = "D8:13:2A:7F:2F:FE"
         self.CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
         self.client = BleakClient(self.bt_address)
+        self.isBTRequested = False
 
 
     def connect(self):
         """
         Connects to the serial port.
         """
-        # try:
-        #     self.device = serial.Serial(port, baud_rate, timeout=1)
-        #     logging.info(f"Connected to serial port {port} at {baud_rate} baud.")
-        # except serial.SerialException as e:
-        #     logging.error(f"Failed to connect to serial port {port}: {e}")
-        #     raise e
-
-        # try:
-        #     await self.client.connect()
-        #     print(f"Connected to {self.bt_address}")
-        # except Exception as e:
-        #     print(f"Failed to connect: {e}")
-
+        self.isBTRequested = True
         self.running = True
         asyncio.run(self.start_bluetooth_recieve())
         
@@ -49,34 +38,14 @@ class SignalReceiver:
         """
         Disconnects from the serial port.
         """
-        if self.device:
-            self.device.close()
-            logging.info("Disconnected from serial port.")
-        else:
-            logging.warning("No serial port to disconnect from.")
+        # TODO: Add safe close 
+        self.isBTRequested = False
 
     def start_reception(self, sampling_rate):
         """
         Starts the signal reception thread.
         """
-        # self.running = True
-        # logging.info("SignalReceiver thread started.")
-
-        # async def start_listening():
-        #     # Start receiving notifications
-        #     await self.client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
-        #     await self.client.stop_notify(self.CHARACTERISTIC_UUID)
-
-        # listen_loop = asyncio.new_event_loop()
-        # asyncio.set_event_loop(listen_loop)
-
-        # try:
-        #     listen_loop.run_until_complete(start_listening())
-        # finally:
-        #     listen_loop.close()
-        self.running = True
-        bt_recieve_thread = threading.Thread(target=self.connect)
-        bt_recieve_thread.start()
+        #TODO: add a way to start BT connection but noot receive data
             
 
 
@@ -84,11 +53,8 @@ class SignalReceiver:
         """
         Stops the signal reception thread.
         """
-        # self.running = False
-        # if self.thread:
-        #     self.thread.join()
-        # self.device.close()
-        logging.info("SignalReceiver thread stopped and serial port closed.")
+        #TODO: add a way to stop signal receive and keep the connection alive
+        # logging.info("SignalReceiver thread stopped and serial port closed.")
 
     def receive_signals(self, sender, data):
         """
@@ -116,13 +82,15 @@ class SignalReceiver:
                     else:
                         logging.warning(f"Null value encountered in signal: {signal}")
                     logging.debug(f"Received signal: {signal}")
+                    # print(f"Received signal: {signal}")
             except Exception as e:
                 logging.error(f"Error receiving signals: {e}")
 
             elapsed_time = time.time() - start_time
             sleep_time = read_interval - elapsed_time
             if sleep_time > 0:
-                time.sleep(sleep_time)
+                # time.sleep(sleep_time)
+                pass
             else:
                 logging.warning("Signal reception is lagging behind the desired rate.")
 
@@ -144,12 +112,15 @@ class SignalReceiver:
         async with BleakClient(self.bt_address) as client:
             if client.is_connected:
                 print(f"Connected to {self.bt_address}")
-
-                # Start receiving notifications
+                logging.info(f"Connected to {self.bt_address}")
                 await client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
 
+            while client.is_connected:
+                # Start receiving notifications
+                # await client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
+
                 # Keep the program running to continuously receive data
-                await asyncio.sleep(6)  # Adjust the time as needed
+                await asyncio.sleep(0.0001)  # Adjust the time as needed
 
                 # Stop receiving notifications
                 # await client.stop_notify(self.CHARACTERISTIC_UUID)
