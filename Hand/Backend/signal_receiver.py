@@ -20,7 +20,8 @@ class SignalReceiver:
         self.running = False
         self.thread = None
 
-        self.bt_address = "D8:13:2A:7F:2F:FE"
+        #self.bt_address = "D8:13:2A:7F:2F:FE"
+        self.bt_address = "D30A37C2-C07D-A102-A985-117F0676F72C"
         self.CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
         self.client = BleakClient(self.bt_address)
 

@@ -40,6 +40,7 @@
     </div>
 
     <script>
+        const gestureClass = 3; // Set gesture class to 3 for "Thumbs Up"
         let repCount = 0;
         const totalReps = 3;
         const collectionDuration = 1000;
@@ -54,10 +55,49 @@
                 repCount++;
                 document.getElementById('repCount').textContent = repCount;
                 document.getElementById('message').textContent = "Give a thumbs up now!";
-                
+
+                // Start data collection
+                fetch('/start_collection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 'gesture_class': gestureClass })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Data collection started for gesture class 3');
+                    } else {
+                        console.error('Error starting data collection:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                });
+
                 setTimeout(() => {
                     document.getElementById('message').textContent = "Relax your hand.";
-                    
+
+                    // Stop data collection
+                    fetch('/stop_collection', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Data collection stopped');
+                        } else {
+                            console.error('Error stopping data collection:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                    });
+
                     setTimeout(() => {
                         if (repCount < totalReps) {
                             document.getElementById('message').textContent = "Prepare for next repetition...";
@@ -79,5 +119,3 @@
     </script>
 </body>
 </html>
-```
-</rewritten_file>

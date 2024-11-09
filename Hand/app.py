@@ -179,8 +179,40 @@ def start_collection():
 @app.route('/stop_collection', methods=['POST'])
 def stop_collection():
     # Stop data collection and save data
-    backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
+    data_csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Backend', 'Resources', 'data.csv')
+    backend.data_collector.stop_collection(data_csv_path)
+    #backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
     return jsonify({'success': True})
+
+@app.route('/train_model', methods=['POST'])
+def train_model():
+    try:
+        # Data cleaning and normalization logic
+        backend.trainer.clean_data("Hand/Backend/Resources/data.csv", "Hand/Backend/Resources/cleaned_data.csv")
+        backend.trainer.normalize_data("Hand/Backend/Resources/cleaned_data.csv", "Hand/Backend/Resources/normalized_data.csv", "Hand/Backend/Resources/normalize_bounds.csv")
+        time.sleep(1)
+
+        # Send training signal    
+        backend.trainer.train_model("Hand/Backend/Resources/normalized_data.csv", "Hand/Backend/Resources/model.h5")
+        time.sleep(1)
+        return jsonify({'success': True})
+
+    except Exception as e:
+        app.logger.error(f"Error during model training: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+    
+@app.route('/evaluate_model', methods=['POST'])
+def evaluate_model():
+    try:
+        # Perform model evaluation
+        min_vals, max_vals = backend.trainer.read_normalization_bounds("Hand/Backend/Resources/normalize_bounds.csv")
+        backend.predictor.start_prediction("Hand/Backend/Resources/model.h5", min_vals, max_vals, 100, 0.2, 0.05)
+        time.sleep(5)
+        backend.predictor.stop_prediction()
+
+    except Exception as e:
+        app.logger.error(f"Error during model evaluation: {e}")
+        return jsonify({'success': False, 'error': str(e)})
 
 if __name__ == '__main__':
     app.run(debug=True)
