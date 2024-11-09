@@ -1,7 +1,7 @@
 import sys
+import time
 sys.path.append('.')
 
-import time
 import Hand.Backend.controller_backend as be
 
 if __name__ == '__main__':
@@ -9,32 +9,39 @@ if __name__ == '__main__':
     # Create backend instance
     backend = be.ControllerBackend()
 
-    # Connect to the device
+    # Measure time to connect to the device
+    start_time = time.time()
     backend.signal_receiver.connect()
-    time.sleep(5)
-
-    # Start receiving signals
-    # backend.signal_receiver.start_reception(100)
+    end_time = time.time()
+    connect_latency = end_time - start_time
+    print(f"Time to connect to the device: {connect_latency:.4f} seconds")
 
     # Wait for a second
     time.sleep(1)
-    
 
-    """ # ----- Data Collection -----
-    # Start a data collection phase for "open" gesture, lasting 3 seconds
+    # ----- Data Collection -----
+    # Measure time to collect data for "open" gesture
+    start_time = time.time()
     backend.data_collector.start_collection(0, 100, 0.2, 0.05)
     time.sleep(3)
     backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
+    end_time = time.time()
+    open_gesture_latency = end_time - start_time
+    print(f"Time to collect data for 'open' gesture: {open_gesture_latency:.4f} seconds")
 
-    # Start a data collection phase for "fist" gesture, lasting 3 seconds
+    # Measure time to collect data for "fist" gesture
+    start_time = time.time()
     backend.data_collector.start_collection(1, 100, 0.2, 0.05)
     time.sleep(3)
     backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
+    end_time = time.time()
+    fist_gesture_latency = end_time - start_time
+    print(f"Time to collect data for 'fist' gesture: {fist_gesture_latency:.4f} seconds")
 
     # Wait for a second
     time.sleep(1)
 
-
+    '''
     # ----- Data Preperation -----
     # Clean the data
     backend.trainer.clean_data("Hand/Backend/Resources/data.csv", "Hand/Backend/Resources/cleaned_data.csv")
@@ -51,7 +58,7 @@ if __name__ == '__main__':
     backend.trainer.train_model("Hand/Backend/Resources/normalized_data.csv", "Hand/Backend/Resources/model.h5")
 
     # Wait for a second
-    time.sleep(1) """
+    time.sleep(1)
 
 
     # ----- Gesture Predicting -----
@@ -62,3 +69,4 @@ if __name__ == '__main__':
     backend.predictor.start_prediction("Hand/Backend/Resources/model.h5", min_vals, max_vals, 100, 0.2, 0.05)
     time.sleep(5)
     backend.predictor.stop_prediction()
+    '''

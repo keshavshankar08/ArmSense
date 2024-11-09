@@ -4,14 +4,14 @@ sys.path.append('.')
 from Hand.Backend.feature_extractor import *
 
 from collections import deque
-import time, logging, threading
+import time, threading
 import numpy as np
 import csv
 
 class DataCollector:
     def __init__(self, signal_receiver):
         """
-        Initializes the DataCollector with the given signal receiver.
+        Initializes the DataCollector.
 
         :param signal_receiver: SignalReceiver instance
         """
@@ -35,7 +35,6 @@ class DataCollector:
         self.running = True
         self.thread = threading.Thread(target=self.collect_data, args=(gesture_class, sampling_rate, window_size, interval_size,), daemon=True)
         self.thread.start()
-        logging.info("DataCollector thread started.")
 
     def stop_collection(self, output_data_file_name):
         """
@@ -78,7 +77,10 @@ class DataCollector:
         :param output_data_file_name: The name of the file to save the collected data.
         '''
         with self.buffer_lock:
-            with open(output_data_file_name, mode='a', newline='') as file:
-                writer = csv.writer(file)
-                while self.feature_buffer:
-                    writer.writerow(self.feature_buffer.popleft())
+            try:
+                with open(output_data_file_name, mode='a', newline='') as file:
+                    writer = csv.writer(file)
+                    while self.feature_buffer:
+                        writer.writerow(self.feature_buffer.popleft())
+            except Exception as e:
+                return
