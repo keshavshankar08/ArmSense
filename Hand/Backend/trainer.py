@@ -85,7 +85,7 @@ class Trainer:
         X_valid, X_test, y_valid, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42)
 
         model = tf.keras.Sequential([
-            tf.keras.layers.InputLayer(input_shape=(48,)),
+            tf.keras.layers.InputLayer(shape=(48,)),
             tf.keras.layers.Dense(64, activation='relu'),
             tf.keras.layers.Dense(32, activation='relu'),
             tf.keras.layers.Dense(5, activation='softmax')
