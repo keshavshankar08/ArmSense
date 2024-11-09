@@ -187,13 +187,23 @@ def stop_collection():
 @app.route('/train_model', methods=['POST'])
 def train_model():
     try:
+        # Define the base path for resources
+        base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Backend', 'Resources')
+
+        # Construct file paths
+        data_csv_path = os.path.join(base_path, 'data.csv')
+        cleaned_data_csv_path = os.path.join(base_path, 'cleaned_data.csv')
+        normalized_data_csv_path = os.path.join(base_path, 'normalized_data.csv')
+        normalize_bounds_csv_path = os.path.join(base_path, 'normalize_bounds.csv')
+        model_path = os.path.join(base_path, 'model.h5')
+
         # Data cleaning and normalization logic
-        backend.trainer.clean_data("Hand/Backend/Resources/data.csv", "Hand/Backend/Resources/cleaned_data.csv")
-        backend.trainer.normalize_data("Hand/Backend/Resources/cleaned_data.csv", "Hand/Backend/Resources/normalized_data.csv", "Hand/Backend/Resources/normalize_bounds.csv")
+        backend.trainer.clean_data(data_csv_path, cleaned_data_csv_path)
+        backend.trainer.normalize_data(cleaned_data_csv_path, normalized_data_csv_path, normalize_bounds_csv_path)
         time.sleep(1)
 
         # Send training signal    
-        backend.trainer.train_model("Hand/Backend/Resources/normalized_data.csv", "Hand/Backend/Resources/model.h5")
+        backend.trainer.train_model(normalized_data_csv_path, model_path)
         time.sleep(1)
         return jsonify({'success': True})
 
