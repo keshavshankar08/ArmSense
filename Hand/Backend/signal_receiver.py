@@ -20,60 +20,48 @@ class SignalReceiver:
         self.bt_address = "76FF84F4-9D42-7F49-B6BB-F2EA5F824A8D"
         self.CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
         self.client = BleakClient(self.bt_address)
-
-
-    def connect(self):
-        """
-        Connects to the bluetooth device.
-        """
-        # TODO: Make this method connect to the bluetooth device
-        # try:
-        #     await self.client.connect()
-        #     print(f"Connected to {self.bt_address}")
-        # except Exception as e:
-        #     print(f"Failed to connect: {e}")
-
-        self.running = True
-        asyncio.run(self.start_bluetooth_recieve())
-        
-    def disconnect(self):
-        """
-        Disconnects from the bluetooth device
-        """
-        # TODO: Make this method disconnect from the bluetooth device
-        pass
+        self.isBTRequested = False
 
     def start_reception(self, sampling_rate):
         """
         Starts the signal reception thread.
         """
-        # TODO: Make this method starting receiving the signals
-        # self.running = True
-
-        # async def start_listening():
-        #     # Start receiving notifications
-        #     await self.client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
-        #     await self.client.stop_notify(self.CHARACTERISTIC_UUID)
-
-        # listen_loop = asyncio.new_event_loop()
-        # asyncio.set_event_loop(listen_loop)
-
-        # try:
-        #     listen_loop.run_until_complete(start_listening())
-        # finally:
-        #     listen_loop.close()
+        self.isBTRequested = True
         self.running = True
-        bt_recieve_thread = threading.Thread(target=self.connect)
-        bt_recieve_thread.start()
+        self.thread = threading.Thread(target=self.run_async_receiver, args=(sampling_rate,), daemon=True)
+        self.thread.start()
             
     def stop_reception(self):
         """
         Stops the signal reception thread.
         """
-        # TODO: Make this method stop receiving the signals
-        pass
+        self.isBTRequested = False
+        self.running = False
+        if self.thread:
+            self.thread.join()
 
-    def receive_signals(self, sender, data):
+    def run_async_receiver(self, sampling_rate):
+        """
+        Runs the async bluetooth_receiver function in an event loop.
+        """
+        asyncio.run(self.bluetooth_receiver(sampling_rate))
+
+    async def bluetooth_receiver(self, _):
+        async with BleakClient(self.bt_address) as client:
+            if client.is_connected:
+                print(f"Connected to {self.bt_address}")
+                await client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
+
+            while client.is_connected:
+                # Keep the program running to continuously receive data
+                await asyncio.sleep(0.0001)  # Adjust the time as needed
+
+                # Stop receiving notifications
+                if not self.isBTRequested:
+                    await client.stop_notify(self.CHARACTERISTIC_UUID)
+                    await client.disconnect()
+                        
+    def receive_signals(self, _, data):
         """
         Continuously reads signals from the device.
         """
@@ -96,13 +84,14 @@ class SignalReceiver:
                     if None not in signal:
                         with self.buffer_lock:
                             self.signal_buffer.append(signal)
-            except Exception as e:
+            
+            except Exception:
                 return
 
             elapsed_time = time.time() - start_time
             sleep_time = read_interval - elapsed_time
             if sleep_time > 0:
-                time.sleep(sleep_time)
+                pass
 
     def get_last_n_signals(self, n):
         """
@@ -116,18 +105,3 @@ class SignalReceiver:
                 return np.array(list(self.signal_buffer)[-n:])
             else:
                 return None
-            
-
-    async def start_bluetooth_recieve(self):
-        async with BleakClient(self.bt_address) as client:
-            if client.is_connected:
-                print(f"Connected to {self.bt_address}")
-
-                # Start receiving notifications
-                await client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
-
-                # Keep the program running to continuously receive data
-                await asyncio.sleep(6)  # Adjust the time as needed
-
-                # Stop receiving notifications
-                # await client.stop_notify(self.CHARACTERISTIC_UUID)
