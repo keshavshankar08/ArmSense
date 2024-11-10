@@ -58,12 +58,14 @@
         fetch('/evaluate_model', {
             method: 'POST'
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = "{{ url_for('evaluate') }}";
+        .then(response => {
+            if (response.ok) {
+                // Redirect to the gesture prediction page
+                window.location.href = '/get_gesture_prediction';
             } else {
-                alert('Error during model evaluation: ' + data.error);
+                response.text().then(text => {
+                    alert('Error during model evaluation:\n' + text);
+                });
             }
         })
         .catch(error => {

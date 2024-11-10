@@ -30,6 +30,9 @@ BAUD_RATE = 115200
 # Buffer to store the latest data
 data_buffers = [deque(maxlen=100) for _ in range(8)]
 
+# Add this at the top of your file
+latest_prediction = None
+
 @app.route('/find_devices', methods=['POST'])
 def find_devices():
     # Logic to find Bluetooth devices
@@ -213,21 +216,44 @@ def train_model():
     
 @app.route('/evaluate_model', methods=['POST'])
 def evaluate_model():
+    global latest_prediction  # Declare the global variable
     try:
         base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Backend', 'Resources')
         normalize_bounds_csv_path = os.path.join(base_path, 'normalize_bounds.csv')
+        model_path = os.path.join(base_path, 'model.h5')
+
         # Perform model evaluation
         min_vals, max_vals = backend.trainer.read_normalization_bounds(normalize_bounds_csv_path)
-        backend.predictor.start_prediction("Hand/Backend/Resources/model.h5", min_vals, max_vals, 100, 0.2, 0.05)
-        time.sleep(5)
+        backend.predictor.start_prediction(model_path, min_vals, max_vals, 100, 0.2, 0.05)
+        time.sleep(5)  # Wait for some predictions to be made
         backend.predictor.stop_prediction()
-        prediction = backend.predictor.get_prediction()
-        #return jsonify({'success': True})
-        return render_template('gesture_prediction.html', prediction=prediction)
+
+        # Check for errors in the predictor thread
+        error = backend.predictor.get_error()
+        if error:
+            raise error  # This will be caught by the except block
+
+        # Get the prediction
+        prediction_index = backend.predictor.get_prediction()
+        if prediction_index is not None:
+            # Map the prediction index to the gesture label
+            gesture_labels = {0: 'Fist', 1: 'Peace Sign', 2: 'Pointing', 3: 'Pointing'}
+            latest_prediction = gesture_labels.get(prediction_index, 'Unknown')
+        else:
+            latest_prediction = 'No prediction made.'
+
+        return jsonify({'success': True})
 
     except Exception as e:
         app.logger.error(f"Error during model evaluation: {e}")
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/get_gesture_prediction', methods=['GET'])
+def gesture_prediction():
+    # Example: Pass a dummy prediction for demonstration
+    global latest_prediction
+    return render_template('gesture_prediction.html', predicted_gesture=latest_prediction)
+
 if __name__ == '__main__':
+    print(app.url_map)
     app.run(debug=True)
