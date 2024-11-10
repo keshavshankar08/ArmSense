@@ -82,7 +82,7 @@ def index():
 def pair():
     app.logger.info('Attempting to pair armband')
     try:
-        backend.signal_receiver.connect()  # Start Bluetooth connection
+        backend.signal_receiver.start_reception(100)  # Start Bluetooth connection
         time.sleep(10)
         # print(backend.signal_receiver.get_last_n_signals(2))
         # return jsonify({'success': True})
@@ -219,6 +219,7 @@ def evaluate_model():
         backend.predictor.start_prediction("Hand/Backend/Resources/model.h5", min_vals, max_vals, 100, 0.2, 0.05)
         time.sleep(5)
         backend.predictor.stop_prediction()
+        return jsonify({'success': True})
 
     except Exception as e:
         app.logger.error(f"Error during model evaluation: {e}")
