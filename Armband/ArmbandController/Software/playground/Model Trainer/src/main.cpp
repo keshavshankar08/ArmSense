@@ -95,7 +95,7 @@ void setup() {
   Serial.begin(115200);
 
   // Create the BLE Device
-  BLEDevice::init("UART Service");
+  BLEDevice::init("MDT UART Service");
 
   // Create the BLE Server
   pServer = BLEDevice::createServer();
@@ -127,23 +127,50 @@ const int noiseLevel = 50;
 
 unsigned long lastToggleTime = 0;
 bool signalOn = false;
+int counter = 0;
 
 void loop() {
 
   unsigned long currentTime = millis();
 
-  if (currentTime - lastToggleTime >= signalDuration) {
-    signalOn = !signalOn;
+  if (currentTime - lastToggleTime >= 5000) {
+    counter++;
+    if (counter>4)
+    {
+      counter = 0; 
+    }
     lastToggleTime = currentTime;
   }
 
   String test = "";
+
+  if (counter == 0)
+  {
+    test = "1,1,1,1,1,1,1,1,.";
+  }
+  else if (counter == 1)
+  {
+    test = "1,2000,1,1,1,1,1,1,.";
+  }
+  else if (counter == 2)
+  {
+    test = "1,1,2000,1,1,1,1,1,.";
+  }
+  else if (counter == 3)
+  {
+    test = "1,1,1,2000,1,1,1,1,.";
+  }
+  else if (counter == 4)
+  {
+    test = "1,1,1,1,2000,1,1,1,.";
+  }
+  
   // for (int chan=0; chan<8; chan++) {
   //   int signalValue = signalOn ? random(2000, 4096) : random(0, 1000); // Simulate signal with noise
   //   test += String(signalValue);
   //   test += ",";
   // }
-  test += "0,2000,0,0,0,0,0,0,.";
+  // test += "1,1,1,1,2000,1,1,1,.";
 
   Serial.println(test);
 
