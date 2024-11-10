@@ -9,23 +9,7 @@
 <body>
     <div class="container">
         <h1>Gesture Prediction</h1>
-        <div id="predictionResult">
-            <!-- The prediction result will be displayed here -->
-        </div>
+        <p>The predicted gesture is: {{ predicted_gesture }}</p>
     </div>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        fetch('/get_prediction')
-        .then(response => response.json())
-        .then(data => {
-            const predictionResult = document.getElementById('predictionResult');
-            predictionResult.textContent = `Predicted Gesture: ${data.prediction}`;
-        })
-        .catch(error => {
-            console.error('Error fetching prediction:', error);
-        });
-    });
-    </script>
 </body>
 </html> 

@@ -214,12 +214,16 @@ def train_model():
 @app.route('/evaluate_model', methods=['POST'])
 def evaluate_model():
     try:
+        base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Backend', 'Resources')
+        normalize_bounds_csv_path = os.path.join(base_path, 'normalize_bounds.csv')
         # Perform model evaluation
-        min_vals, max_vals = backend.trainer.read_normalization_bounds("Hand/Backend/Resources/normalize_bounds.csv")
+        min_vals, max_vals = backend.trainer.read_normalization_bounds(normalize_bounds_csv_path)
         backend.predictor.start_prediction("Hand/Backend/Resources/model.h5", min_vals, max_vals, 100, 0.2, 0.05)
         time.sleep(5)
         backend.predictor.stop_prediction()
-        return jsonify({'success': True})
+        prediction = backend.predictor.get_prediction()
+        #return jsonify({'success': True})
+        return render_template('gesture_prediction.html', prediction=prediction)
 
     except Exception as e:
         app.logger.error(f"Error during model evaluation: {e}")
