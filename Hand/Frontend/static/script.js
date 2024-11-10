@@ -170,6 +170,7 @@ function updateCharts() {
         fetch('/get_semg_data')
             .then(response => response.json())
             .then(data => {
+                console.log('Data received:', data); // Debugging line
                 if (!data.data || !Array.isArray(data.data)) {
                     log('updateCharts', 'Invalid data format received.');
                     return;
@@ -184,10 +185,12 @@ function updateCharts() {
             })
             .catch(error => {
                 log('updateCharts', 'Error fetching sEMG data', error);
+                console.error('Fetch error:', error); // Debugging line
             });
         setTimeout(updateCharts, 1000); // Update every second
     } catch (error) {
         log('updateCharts', 'Unexpected error', error);
+        console.error('Unexpected error:', error); // Debugging line
     }
 }
 
