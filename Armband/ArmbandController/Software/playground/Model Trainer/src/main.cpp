@@ -51,9 +51,6 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
-void sendBluetoothData(String);
-String generateFakeADC();
-
 BLEServer *pServer = NULL;
 BLECharacteristic *pTxCharacteristic;
 bool deviceConnected = false;
@@ -122,15 +119,6 @@ void setup() {
   // Start advertising
   pServer->getAdvertising()->start();
   Serial.println("Waiting a client connection to notify...");
-
-  //Setup FREERTOS 
-  xTaskCreate
-  (
-    sendBluetoothData,
-    "Send BT Data",
-    1000,
-    
-  )
 }
 
 const int numChannels = 8;
@@ -142,27 +130,31 @@ bool signalOn = false;
 
 void loop() {
 
-  // unsigned long currentTime = millis();
+  unsigned long currentTime = millis();
 
-  // if (currentTime - lastToggleTime >= signalDuration) {
-  //   signalOn = !signalOn;
-  //   lastToggleTime = currentTime;
-  // }
+  if (currentTime - lastToggleTime >= signalDuration) {
+    signalOn = !signalOn;
+    lastToggleTime = currentTime;
+  }
 
-  // String test = "";
+  String test = "";
   // for (int chan=0; chan<8; chan++) {
   //   int signalValue = signalOn ? random(2000, 4096) : random(0, 1000); // Simulate signal with noise
   //   test += String(signalValue);
   //   test += ",";
   // }
-  // test += ".";
+  test += "0,2000,0,0,0,0,0,0,.";
 
-  // Serial.println(test);
-
-  String test = generateFakeADC();
+  Serial.println(test);
 
   //================Bluetooth Code==================
-  sendBluetoothData(test);
+  std::string payload = test.c_str();
+  if (deviceConnected) {
+    pTxCharacteristic->setValue(payload);  //String value
+    pTxCharacteristic->notify();
+    txValue++;
+    delay(100);  // bluetooth stack will go into congestion, if too many packets are sent
+  }
 
   // disconnecting
   if (!deviceConnected && oldDeviceConnected) {
@@ -176,37 +168,4 @@ void loop() {
     // do stuff here on connecting
     oldDeviceConnected = deviceConnected;
   }
-}
-
-
-//Send bluetooth data based on params passed in
-void sendBluetoothData(String test)
-{
-    std::string payload = test.c_str();
-    if (deviceConnected) {
-      pTxCharacteristic->setValue(payload);  //String value
-      pTxCharacteristic->notify();
-      txValue++;
-      delay(50);  // bluetooth stack will go into congestion, if too many packets are sent
-    }
-}
-
-String generateFakeADC()
-{
-    unsigned long currentTime = millis();
-
-    if (currentTime - lastToggleTime >= signalDuration) {
-      signalOn = !signalOn;
-      lastToggleTime = currentTime;
-    }
-
-    String test = "";
-    for (int chan=0; chan<8; chan++) {
-      int signalValue = signalOn ? random(2000, 4096) : random(0, 1000); // Simulate signal with noise
-      test += String(signalValue);
-      test += ",";
-    }
-    test += ".";
-
-    return test;
 }
