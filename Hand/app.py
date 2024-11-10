@@ -82,7 +82,7 @@ def index():
 def pair():
     app.logger.info('Attempting to pair armband')
     try:
-        backend.signal_receiver.start_reception(100)  # Start Bluetooth connection
+        backend.signal_receiver.start_reception(10)  # Start Bluetooth connection
         time.sleep(10)
         # print(backend.signal_receiver.get_last_n_signals(2))
         # return jsonify({'success': True})
