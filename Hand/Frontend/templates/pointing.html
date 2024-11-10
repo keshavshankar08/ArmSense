@@ -40,9 +40,10 @@
     </div>
 
     <script>
+        const gestureClass = 2; // Set gesture class to 2 for "Point with Index Finger"
         let repCount = 0;
         const totalReps = 3;
-        const collectionDuration = 1000; 
+        const collectionDuration = 1000;
 
         function startCollection() {
             document.getElementById('startButton').style.display = 'none';
@@ -54,10 +55,49 @@
                 repCount++;
                 document.getElementById('repCount').textContent = repCount;
                 document.getElementById('message').textContent = "Point with your index finger now!";
-                
+
+                // Start data collection
+                fetch('/start_collection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 'gesture_class': gestureClass })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Data collection started for gesture class 2');
+                    } else {
+                        console.error('Error starting data collection:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                });
+
                 setTimeout(() => {
                     document.getElementById('message').textContent = "Relax your hand.";
-                    
+
+                    // Stop data collection
+                    fetch('/stop_collection', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Data collection stopped');
+                        } else {
+                            console.error('Error stopping data collection:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                    });
+
                     setTimeout(() => {
                         if (repCount < totalReps) {
                             document.getElementById('message').textContent = "Prepare for next repetition...";
@@ -79,5 +119,3 @@
     </script>
 </body>
 </html>
-```
-</rewritten_file>

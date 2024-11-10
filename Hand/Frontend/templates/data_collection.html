@@ -40,45 +40,84 @@
     </div>
 
     <script>
+        const gestureClass = 0; // Assuming 'Make a Fist' is gesture class 0
         let repCount = 0;
         const totalReps = 3;
-        const collectionDuration = 1000; 
-
+        const collectionDuration = 3000; // Duration for each data collection phase
+    
         function startCollection() {
             document.getElementById('startButton').style.display = 'none';
             collectData();
         }
-
+    
         function collectData() {
             if (repCount < totalReps) {
                 repCount++;
                 document.getElementById('repCount').textContent = repCount;
                 document.getElementById('message').textContent = "Make a fist now!";
-                
+    
+                // Start data collection
+                fetch('/start_collection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 'gesture_class': gestureClass })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Data collection started');
+                    } else {
+                        console.error('Error starting data collection:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                });
+    
+                // After collectionDuration milliseconds
                 setTimeout(() => {
                     document.getElementById('message').textContent = "Relax your hand.";
-                    
+    
+                    // Stop data collection
+                    fetch('/stop_collection', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Data collection stopped');
+                        } else {
+                            console.error('Error stopping data collection:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch error:', error);
+                    });
+    
+                    // Prepare for next repetition or finish
                     setTimeout(() => {
                         if (repCount < totalReps) {
                             document.getElementById('message').textContent = "Prepare for next repetition...";
-                            setTimeout(collectData, 2000);
+                            setTimeout(collectData, 2000); // Wait before starting next repetition
                         } else {
                             finishCollection();
                         }
-                    }, 2000);
-                }, collectionDuration);
+                    }, 2000); // Wait 2 seconds before next step
+                }, collectionDuration); // Wait for the collection duration before stopping
             }
         }
-
+    
         function finishCollection() {
             document.getElementById('message').textContent = "Data collection complete!";
-
             setTimeout(() => {
                 window.location.href = "{{ url_for('peace_sign') }}";
-            }, 3000);
+            }, 2000); 
         }
     </script>
 </body>
 </html>
-```
-</rewritten_file>

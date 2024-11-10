@@ -12,8 +12,14 @@ function log(functionName, purpose, error = null) {
 document.addEventListener('DOMContentLoaded', () => {
     try {
         const pairButton = document.getElementById('pairButton');
+        const findDevicesButton = document.getElementById('findDevicesButton');
+
         if (pairButton) {
             pairButton.addEventListener('click', pairArmband);
+        }
+
+        if (findDevicesButton) {
+            findDevicesButton.addEventListener('click', findDevices);
         }
 
         if (window.location.pathname === '/collection') {
@@ -164,6 +170,7 @@ function updateCharts() {
         fetch('/get_semg_data')
             .then(response => response.json())
             .then(data => {
+                console.log('Data received:', data); // Debugging line
                 if (!data.data || !Array.isArray(data.data)) {
                     log('updateCharts', 'Invalid data format received.');
                     return;
@@ -178,10 +185,12 @@ function updateCharts() {
             })
             .catch(error => {
                 log('updateCharts', 'Error fetching sEMG data', error);
+                console.error('Fetch error:', error); // Debugging line
             });
         setTimeout(updateCharts, 1000); // Update every second
     } catch (error) {
         log('updateCharts', 'Unexpected error', error);
+        console.error('Unexpected error:', error); // Debugging line
     }
 }
 
@@ -205,4 +214,24 @@ function collectData() {
     } catch (error) {
         log('collectData', 'Unexpected error', error);
     }
+}
+
+function findDevices() {
+    log('findDevices', 'Finding Bluetooth devices');
+    // Implement Bluetooth device discovery logic here
+    // This might involve calling a backend endpoint to start the Bluetooth scan
+    fetch('/find_devices', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                log('findDevices', 'Devices found successfully');
+                alert('Devices found successfully.');
+            } else {
+                log('findDevices', 'Failed to find devices');
+                alert('Failed to find devices. Please try again.');
+            }
+        })
+        .catch(error => {
+            log('findDevices', 'Error finding devices', error);
+        });
 }
