@@ -3,29 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Gesture Prediction</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script>
         function fetchLatestPrediction() {
-            fetch('/get_gesture_prediction')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+            fetch('/get_latest_prediction')
+                .then(response => response.json())
                 .then(data => {
                     document.getElementById('predicted-gesture').innerText = data.predicted_gesture;
                 })
-                .catch(error => console.error('Error fetching prediction:', error));
+                .catch(error => console.error('Error fetching latest prediction:', error));
         }
 
-        setInterval(fetchLatestPrediction, 1000);
+        setInterval(fetchLatestPrediction, 1000);  // Fetch every second
     </script>
 </head>
 <body>
-    <div class="container">
-        <h1>Gesture Prediction</h1>
-        <p>The predicted gesture is: {{ predicted_gesture }}</p>
-    </div>
+    <h1>Gesture Prediction</h1>
+    <p>The predicted gesture is: <span id="predicted-gesture">{{ predicted_gesture }}</span></p>
 </body>
 </html> 
