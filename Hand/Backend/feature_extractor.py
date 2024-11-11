@@ -37,7 +37,9 @@ class FeatureExtractor:
         return np.sqrt(np.mean(signal ** 2))
 
     def kurtosis(self, signal):
-        return sp.stats.kurtosis(signal)
+        return 0.0
+        #return sp.stats.kurtosis(signal)
 
     def skewness(self, signal):
-        return sp.stats.skew(signal)
+        return 0.0
+        #return sp.stats.skew(signal)

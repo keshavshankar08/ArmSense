@@ -1,7 +1,7 @@
 import sys
 sys.path.append('.')
 
-from Backend.feature_extractor import *
+from Hand.Backend.feature_extractor import *
 
 import tensorflow as tf
 import time, logging, threading
@@ -75,8 +75,9 @@ class Predictor:
                 if elapsed_time >= interval_size:
                     window = self.signal_receiver.get_last_n_signals(int(window_size * sampling_rate))
                     features = self.feature_extractor.extract_features(window)
-                    normalized_features = (features - min_vals) / (max_vals - min_vals)
-                    normalized_features = normalized_features.reshape(1, -1)
+                    #normalized_features = (features - min_vals) / (max_vals - min_vals)
+                    #normalized_features = normalized_features.reshape(1, -1)
+                    normalized_features = np.array(features).reshape(1, -1)
                     predictions = model.predict(normalized_features)
 
                     # Store the predictions safely

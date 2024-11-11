@@ -17,7 +17,9 @@ if __name__ == '__main__':
     print(f"Time to connect to the device: {connect_latency:.4f} seconds")
 
     # Wait for a second
-    time.sleep(2)
+    time.sleep(1)
+    # -----------------------------------------------------------------------------
+
 
     """ # ----- Data Collection -----
     # Measure time to collect data for "open" gesture
@@ -39,9 +41,11 @@ if __name__ == '__main__':
     print(f"Time to collect data for 'fist' gesture: {fist_gesture_latency:.4f} seconds")
 
     # Wait for a second
-    time.sleep(1) 
+    time.sleep(1)
+    # ----------------------------------------------------------------------------- """
 
-    # ----- Data Preperation -----
+
+    """ # ----- Data Preperation -----
     # Clean the data
     start_time = time.time()
     backend.trainer.clean_data("Hand/Backend/Resources/data.csv", "Hand/Backend/Resources/cleaned_data.csv")
@@ -58,17 +62,21 @@ if __name__ == '__main__':
 
     # Wait for a second
     time.sleep(1)
+    # ----------------------------------------------------------------------------- """
 
-    # ----- Model training -----
+
+    """ # ----- Model training -----
     # Train the model
     start_time = time.time()
-    backend.trainer.train_model("Hand/Backend/Resources/normalized_data.csv", "Hand/Backend/Resources/model.h5")
+    backend.trainer.train_model("Hand/Backend/Resources/data.csv", "Hand/Backend/Resources/model.h5")
     end_time = time.time()
     train_latency = end_time - start_time
     print(f"Time to train: {train_latency:.4f} seconds")
 
     # Wait for a second
-    time.sleep(1) """
+    time.sleep(1)
+    # ----------------------------------------------------------------------------- """
+    
 
     # ----- Gesture Predicting -----
     # Read in normalization bounds
@@ -79,11 +87,11 @@ if __name__ == '__main__':
     print(f"Time to read bound data: {read_latency:.4f} seconds")
 
     # Wait for a second
-    time.sleep(2)
+    time.sleep(5)
 
     # Start predicting
     backend.predictor.start_prediction("Hand/Backend/Resources/model.h5", min_vals, max_vals, 100, 0.2, 0.05)
-    time.sleep(5)
+    time.sleep(30)
     backend.predictor.stop_prediction()
 
     # Wait for a second
