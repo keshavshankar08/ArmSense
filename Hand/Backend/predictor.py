@@ -78,13 +78,17 @@ class Predictor:
                     #normalized_features = (features - min_vals) / (max_vals - min_vals)
                     #normalized_features = normalized_features.reshape(1, -1)
                     normalized_features = np.array(features).reshape(1, -1)
-                    predictions = model.predict(normalized_features)
+                    # Suppress TensorFlow progress bar
+                    predictions = model.predict(normalized_features, verbose=0)
 
                     # Store the predictions safely
                     with self.buffer_lock:
                         self.last_prediction = predictions
 
-                    print("Predictions:", predictions)
+                    class_prediction = np.argmax(predictions)
+                    gesture_map = {0: "open", 1: "fist", 2: "peace", 3: "point", 4: "thumb"}
+                    gesture = gesture_map.get(class_prediction, "unknown")
+                    print(f"Predicted gesture: {gesture}")
 
                     start_time = current_time
 
