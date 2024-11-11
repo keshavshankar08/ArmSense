@@ -94,11 +94,37 @@ class MyCallbacks : public BLECharacteristicCallbacks {
   }
 };
 
+void dataParameter()
+{
+
+}
+
+//Send bluetooth data based on params passed in
+void sendBluetoothData(void *param)
+{
+  for(;;)
+  {
+    String *data = (String*) param;
+    std::string payload = data->c_str();
+    if (deviceConnected) {
+      pTxCharacteristic->setValue(payload);  //String value
+      pTxCharacteristic->notify();
+      // txValue++;
+    }
+    vTaskDelay(10 / portTICK_PERIOD_MS);  // bluetooth stack will go into congestion, if too many packets are sent
+  }
+
+}
+
+//Global Vars
+String adcData = "";
+
 void setup() {
+
   Serial.begin(115200);
 
   // Create the BLE Device
-  BLEDevice::init("UART Service");
+  BLEDevice::init("RF UART Service");
 
   // Create the BLE Server
   pServer = BLEDevice::createServer();
@@ -124,13 +150,16 @@ void setup() {
   Serial.println("Waiting a client connection to notify...");
 
   //Setup FREERTOS 
-  xTaskCreate
+  xTaskCreatePinnedToCore
   (
     sendBluetoothData,
     "Send BT Data",
-    1000,
-    
-  )
+    4096,
+    &adcData,
+    1,
+    NULL,
+    1
+  );
 }
 
 const int numChannels = 8;
@@ -159,10 +188,10 @@ void loop() {
 
   // Serial.println(test);
 
-  String test = generateFakeADC();
+  adcData = generateFakeADC();
 
   //================Bluetooth Code==================
-  sendBluetoothData(test);
+  // sendBluetoothData(adcData);
 
   // disconnecting
   if (!deviceConnected && oldDeviceConnected) {
@@ -178,18 +207,6 @@ void loop() {
   }
 }
 
-
-//Send bluetooth data based on params passed in
-void sendBluetoothData(String test)
-{
-    std::string payload = test.c_str();
-    if (deviceConnected) {
-      pTxCharacteristic->setValue(payload);  //String value
-      pTxCharacteristic->notify();
-      txValue++;
-      delay(50);  // bluetooth stack will go into congestion, if too many packets are sent
-    }
-}
 
 String generateFakeADC()
 {
