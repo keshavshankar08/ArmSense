@@ -24,7 +24,7 @@ app.logger.addHandler(handler)
 app.logger.setLevel(logging.DEBUG)
 
 # Serial port configuration
-SERIAL_PORT = '/dev/cu.usbserial-0001'
+SERIAL_PORT = '/dev/ttyUSB1'
 BAUD_RATE = 115200
 
 try:

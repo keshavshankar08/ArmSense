@@ -109,6 +109,6 @@ if __name__ == '__main__':
     thumb = np.array([1,1,1,1,2000,1,1,1]) """
     #data_preparation()
     #model_training()
-    gesture_predicting()
+    #gesture_predicting()
 
     backend.signal_receiver.stop_reception()
