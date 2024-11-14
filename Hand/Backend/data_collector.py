@@ -1,8 +1,4 @@
-import sys
-sys.path.append('.')
-
-from Hand.Backend.feature_extractor import *
-
+import Hand.Backend.feature_extractor as fe
 from collections import deque
 import time, threading
 import numpy as np
@@ -17,13 +13,17 @@ class DataCollector:
         """
         self.signal_receiver = signal_receiver
 
-        self.feature_extractor = FeatureExtractor()
+        self.feature_extractor = fe.FeatureExtractor()
         self.feature_buffer = deque(maxlen=100)
         self.buffer_lock = threading.Lock()
         self.running = False
         self.thread = None
+        self.feature_data_file_name = "Hand/Backend/Resources/feature_data.csv"
+        self.sampling_rate = 100
+        self.window_size = 0.2
+        self.interval_size = 0.05
 
-    def start_collection(self, gesture_class, sampling_rate, window_size, interval_size):
+    def start_collection(self, gesture_class):
         """
         Starts the data collection thread.
 
@@ -33,10 +33,10 @@ class DataCollector:
         :param interval_size: The interval size between each collection
         """
         self.running = True
-        self.thread = threading.Thread(target=self.collect_data, args=(gesture_class, sampling_rate, window_size, interval_size,), daemon=True)
+        self.thread = threading.Thread(target=self.collect_data, args=(gesture_class,), daemon=True)
         self.thread.start()
 
-    def stop_collection(self, output_data_file_name):
+    def stop_collection(self):
         """
         Stops the data collection thread.
 
@@ -45,9 +45,9 @@ class DataCollector:
         self.running = False
         if self.thread:
             self.thread.join()
-        self.save_data(output_data_file_name)
+        self.save_data(self.feature_data_file_name)
 
-    def collect_data(self, gesture_class, sampling_rate, window_size, interval_size):
+    def collect_data(self, gesture_class):
         '''
         Collects data for the given gesture class.
 
@@ -62,8 +62,8 @@ class DataCollector:
             current_time = time.time()
             elapsed_time = current_time - start_time
 
-            if (elapsed_time >= interval_size):
-                window = self.signal_receiver.get_last_n_signals(int(window_size * sampling_rate))
+            if (elapsed_time >= self.interval_size):
+                window = self.signal_receiver.get_last_n_signals(int(self.window_size * self.sampling_rate))
                 features = self.feature_extractor.extract_features(window)
                 features = np.append(features, gesture_class)
                 with self.buffer_lock:
@@ -84,3 +84,13 @@ class DataCollector:
                         writer.writerow(self.feature_buffer.popleft())
             except Exception as e:
                 return
+            
+    def clear_data(self):
+        '''
+        Clears the data set collection files.
+        '''
+        try:
+            with open(self.feature_data_file_name, 'w') as file:
+                file.truncate(0)
+        except Exception as e:
+            return

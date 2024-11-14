@@ -176,7 +176,7 @@ def thumbs_up():
 def start_collection():
     gesture_class = int(request.json.get('gesture_class'))
     # Start data collection
-    backend.data_collector.start_collection(gesture_class, 100, 0.2, 0.05)
+    backend.data_collector.start_collection(gesture_class)
     return jsonify({'success': True})
 
 @app.route('/stop_collection', methods=['POST'])

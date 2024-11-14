@@ -1,7 +1,7 @@
 import sys
 sys.path.append('.')
 
-from Hand.Backend.feature_extractor import *
+import Hand.Backend.feature_extractor as fe
 
 import tensorflow as tf
 import time, logging, threading
@@ -16,7 +16,7 @@ class Predictor:
         """
         self.signal_receiver = signal_receiver
 
-        self.feature_extractor = FeatureExtractor()
+        self.feature_extractor = fe.FeatureExtractor()
         self.buffer_lock = threading.Lock()
         self.running = False
         self.thread = None

@@ -1,6 +1,3 @@
-import sys
-sys.path.append('.')
-
 import threading, time
 from collections import deque
 import numpy as np
@@ -23,14 +20,15 @@ class SignalReceiver:
         self.client = BleakClient(self.bt_address)
         self.isBTRequested = False
         self.devices = None
+        self.sampling_rate = 100
 
-    def start_reception(self, sampling_rate):
+    def start_reception(self):
         """
         Starts the signal reception thread.
         """
         self.isBTRequested = True
         self.running = True
-        self.thread = threading.Thread(target=self.run_async_receiver, args=(sampling_rate,), daemon=True)
+        self.thread = threading.Thread(target=self.run_async_receiver, daemon=True)
         self.thread.start()
             
     def stop_reception(self):
@@ -42,13 +40,13 @@ class SignalReceiver:
         if self.thread:
             self.thread.join()
 
-    def run_async_receiver(self, sampling_rate):
+    def run_async_receiver(self):
         """
         Runs the async bluetooth_receiver function in an event loop.
         """
-        asyncio.run(self.bluetooth_receiver(sampling_rate))
+        asyncio.run(self.bluetooth_receiver())
 
-    async def bluetooth_receiver(self, _):
+    async def bluetooth_receiver(self):
         async with BleakClient(self.bt_address) as client:
             if client.is_connected:
                 print(f"Connected to {self.bt_address}")
@@ -67,13 +65,12 @@ class SignalReceiver:
         """
         Continuously reads signals from the device.
         """
-        read_interval = 1.0 / 1000
+        read_interval = 1.0 / self.sampling_rate
 
         if self.running:
             start_time = time.time()
             try:
                 line = data.decode('utf-8').strip('.').rstrip(',')
-                print(line)
                 if line:
                     parts = line.split('.')[0].split(',')
                     if len(parts) != 8:
