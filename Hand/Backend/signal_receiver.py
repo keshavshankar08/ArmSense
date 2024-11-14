@@ -115,7 +115,6 @@ class SignalReceiver:
         """
         devices = await BleakScanner.discover()
         self.devices = [(device.name, device.address) for device in devices if device.name == self.device_name]
-        print(self.devices[0])
 
     async def set_device(self, device_name):
         """
@@ -126,5 +125,4 @@ class SignalReceiver:
         for name, address in self.devices:
             if name == device_name:
                 self.bt_address = address
-                print("set")
                 return
