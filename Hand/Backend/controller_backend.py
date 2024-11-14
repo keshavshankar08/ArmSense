@@ -1,11 +1,8 @@
-import sys
-sys.path.append('.')
-
-from Backend.signal_receiver import *
-from Backend.data_collector import *
-from Backend.trainer import *
-from Backend.predictor import *
-from Backend.feature_extractor import *
+from Hand.Backend.signal_receiver import *
+from Hand.Backend.data_collector import *
+from Hand.Backend.trainer import *
+from Hand.Backend.predictor import *
+from Hand.Backend.feature_extractor import *
 
 class ControllerBackend:
     def __init__(self):

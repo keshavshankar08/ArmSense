@@ -1,7 +1,7 @@
 import sys
 sys.path.append('.')
 
-from Backend.feature_extractor import *
+from Hand.Backend.feature_extractor import *
 
 import tensorflow as tf
 import time, logging, threading
