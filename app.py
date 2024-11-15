@@ -7,13 +7,11 @@ import os
 import time
 from threading import Thread
 from collections import deque
-sys.path.append(os.path.abspath('Backend'))
 from logging.handlers import RotatingFileHandler
-from Backend.controller_backend import ControllerBackend
-from Backend.signal_receiver import SignalReceiver
+import Hand.Backend.controller_backend as be
 
-app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
-backend = ControllerBackend()
+app = Flask(__name__, template_folder='Hand/Frontend/templates', static_folder='Hand/Frontend/static')
+backend = be.ControllerBackend()
 
 # Set up logging
 handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=1)
@@ -24,14 +22,36 @@ app.logger.addHandler(handler)
 app.logger.setLevel(logging.DEBUG)
 
 # Serial port configuration
-SERIAL_PORT = '/dev/cu.usbserial-0001'
+SERIAL_PORT = '/dev/ttyUSB1'
 BAUD_RATE = 115200
 
+try:
+    ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+    app.logger.info(f"Serial port {SERIAL_PORT} opened successfully.")
+except serial.SerialException as e:
+    ser = None  # Ensure ser is defined even if opening fails
+    app.logger.error(f"Error opening serial port {SERIAL_PORT}: {e}")
 # Buffer to store the latest data
 data_buffers = [deque(maxlen=100) for _ in range(8)]
 
 # Add this at the top of your file
 latest_prediction = None
+
+gesture_labels = {
+    0: 'Resting',
+    1: 'Fist',
+    2: 'Peace Sign',
+    3: 'Pointing',
+    4: 'Thumbs Up'
+}
+
+command_map = {
+    0: 0,
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 4
+}
 
 @app.route('/find_devices', methods=['POST'])
 def find_devices():
@@ -79,7 +99,7 @@ def find_devices():
 def index():
     app.logger.info('Rendering index page')
     print("Index page rendered")
-    return render_template('index.html')
+    return render_template('Hand/Frontend/templates/index.html')
 
 @app.route('/pair', methods=['POST'])
 def pair():
@@ -100,7 +120,7 @@ def pair():
 @app.route('/collection')
 def collection():
     app.logger.info('Rendering collection page')
-    return render_template('collection.html')
+    return render_template('Hand/Frontend/templates/collection.html')
 
 @app.route('/collect', methods=['POST'])
 def collect():
@@ -146,7 +166,7 @@ def data_collection():
     if request.method == 'POST':
         # Redirect to the next page in the sequence
         return redirect(url_for('peace_sign'))
-    return render_template('data_collection.html')
+    return render_template('Hand/Frontend/templates/data_collection.html')
 
 @app.route('/peace_sign', methods=['GET', 'POST'])
 def peace_sign():
@@ -154,7 +174,7 @@ def peace_sign():
     if request.method == 'POST':
         # Redirect to the next page in the sequence
         return redirect(url_for('pointing'))
-    return render_template('peace_sign.html')
+    return render_template('Hand/Frontend/templates/peace_sign.html')
 
 @app.route('/pointing', methods=['GET', 'POST'])
 def pointing():
@@ -162,7 +182,7 @@ def pointing():
     if request.method == 'POST':
         # Redirect to the next page in the sequence
         return redirect(url_for('thumbs_up'))
-    return render_template('pointing.html')
+    return render_template('Hand/Frontend/templates/pointing.html')
 
 @app.route('/thumbs_up', methods=['GET', 'POST'])
 def thumbs_up():
@@ -170,7 +190,7 @@ def thumbs_up():
     if request.method == 'POST':
         # Redirect back to collection page
         return redirect(url_for('collection'))
-    return render_template('thumbs_up.html')
+    return render_template('Hand/Frontend/templates/thumbs_up.html')
 
 @app.route('/start_collection', methods=['POST'])
 def start_collection():
@@ -182,9 +202,7 @@ def start_collection():
 @app.route('/stop_collection', methods=['POST'])
 def stop_collection():
     # Stop data collection and save data
-    data_csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Backend', 'Resources', 'data.csv')
-    backend.data_collector.stop_collection(data_csv_path)
-    #backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
+    backend.data_collector.stop_collection()
     return jsonify({'success': True})
 
 @app.route('/train_model', methods=['POST'])
@@ -216,7 +234,44 @@ def train_model():
     
 @app.route('/evaluate_model', methods=['POST'])
 def evaluate_model():
-    global latest_prediction  # Declare the global variable
+    try:
+        # Start the continuous prediction in a background thread
+        prediction_thread = Thread(target=continuous_prediction)
+        prediction_thread.daemon = True
+        prediction_thread.start()
+
+        # Redirect to the gesture prediction page
+        return jsonify({'success': True, 'redirect': url_for('gesture_prediction')})
+
+    except Exception as e:
+        app.logger.error(f"Error starting evaluation: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/get_gesture_prediction', methods=['GET'])
+def gesture_prediction():
+    # Example: Pass a dummy prediction for demonstrations
+    global latest_prediction
+    return render_template('gesture_prediction.html', predicted_gesture=latest_prediction)
+
+def send_serial_command(prediction_index):
+    if ser and ser.is_open:
+        try:
+            # Map the prediction index to the command value
+            command_value = command_map.get(prediction_index)
+            print(f"Command value: {command_value}")
+            if command_value is not None:
+                # data_to_send = f"{command_value}"
+                ser.write(f"{command_value}".encode())
+                ser.flush()
+            else:
+                app.logger.error(f"Unrecognized prediction index: {prediction_index}")
+        except serial.SerialException as e:
+            app.logger.error(f"Error sending serial command: {e}")
+    else:
+        app.logger.error("Serial port is not open.")
+
+def continuous_prediction():
+    global latest_prediction
     try:
         base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Backend', 'Resources')
         normalize_bounds_csv_path = os.path.join(base_path, 'normalize_bounds.csv')
@@ -225,34 +280,36 @@ def evaluate_model():
         # Perform model evaluation
         min_vals, max_vals = backend.trainer.read_normalization_bounds(normalize_bounds_csv_path)
         backend.predictor.start_prediction(model_path, min_vals, max_vals, 100, 0.2, 0.05)
-        time.sleep(5)  # Wait for some predictions to be made
-        backend.predictor.stop_prediction()
+        
+        while True:
+            # Check for errors in the predictor thread
+            error = backend.predictor.get_error()
+            if error:
+                raise error  # This will be caught by the except block
 
-        # Check for errors in the predictor thread
-        error = backend.predictor.get_error()
-        if error:
-            raise error  # This will be caught by the except block
+            # Get the prediction
+            prediction_index = backend.predictor.get_prediction()
+            if prediction_index is not None:
+                # Map the prediction index to the gesture label
+                latest_prediction = gesture_labels.get(prediction_index, 'Unknown')
+                app.logger.info(f"Latest prediction: {latest_prediction}")
 
-        # Get the prediction
-        prediction_index = backend.predictor.get_prediction()
-        if prediction_index is not None:
-            # Map the prediction index to the gesture label
-            gesture_labels = {0: 'Fist', 1: 'Peace Sign', 2: 'Pointing', 3: 'Pointing'}
-            latest_prediction = gesture_labels.get(prediction_index, 'Unknown')
-        else:
-            latest_prediction = 'No prediction made.'
+                # Send the predicted gesture over serial
+                send_serial_command(prediction_index)
+            else:
+                latest_prediction = 'No prediction made.'
+                app.logger.info(latest_prediction)
 
-        return jsonify({'success': True})
+            time.sleep(1)  # Adjust sleep time as needed
 
     except Exception as e:
-        app.logger.error(f"Error during model evaluation: {e}")
-        return jsonify({'success': False, 'error': str(e)})
+        app.logger.error(f"Error during continuous prediction: {e}")
+        backend.predictor.stop_prediction()
 
-@app.route('/get_gesture_prediction', methods=['GET'])
-def gesture_prediction():
-    # Example: Pass a dummy prediction for demonstration
+@app.route('/get_latest_prediction', methods=['GET'])
+def get_latest_prediction():
     global latest_prediction
-    return render_template('gesture_prediction.html', predicted_gesture=latest_prediction)
+    return jsonify({'predicted_gesture': latest_prediction})
 
 if __name__ == '__main__':
     print(app.url_map)

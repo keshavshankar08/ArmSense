@@ -28,9 +28,6 @@ class DataCollector:
         Starts the data collection thread.
 
         :param gesture_class: The class of the gesture to be collected.
-        :param sampling_rate: The sampling rate of the signal receiver.
-        :param window_size: The size of the window to be collected.
-        :param interval_size: The interval size between each collection
         """
         self.running = True
         self.thread = threading.Thread(target=self.collect_data, args=(gesture_class,), daemon=True)
@@ -39,8 +36,6 @@ class DataCollector:
     def stop_collection(self):
         """
         Stops the data collection thread.
-
-        :param output_data_file_name: The name of the file to save the collected data.
         """
         self.running = False
         if self.thread:
@@ -52,9 +47,6 @@ class DataCollector:
         Collects data for the given gesture class.
 
         :param gesture_class: The class of the gesture to be collected.
-        :param sampling_rate: The sampling rate of the signal receiver.
-        :param window_size: The size of the window to be collected.
-        :param interval_size: The interval size between each collection
         '''
         start_time = time.time()
 
