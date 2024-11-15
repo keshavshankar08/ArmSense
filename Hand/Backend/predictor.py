@@ -1,10 +1,7 @@
-import sys
-sys.path.append('.')
-
-from Backend.feature_extractor import *
-
+import Hand.Backend.feature_extractor as fe
+import csv
 import tensorflow as tf
-import time, logging, threading
+import time, threading
 import numpy as np
 
 class Predictor:
@@ -16,34 +13,28 @@ class Predictor:
         """
         self.signal_receiver = signal_receiver
 
-        self.feature_extractor = FeatureExtractor()
+        self.feature_extractor = fe.FeatureExtractor()
         self.buffer_lock = threading.Lock()
         self.running = False
         self.thread = None
 
-        # Add an instance variable to store the last prediction
         self.last_prediction = None
-        self.last_error = None  # Add this variable to store exceptions
+        self.last_error = None
 
-    def start_prediction(self, model_file_name, min_vals, max_vals, sampling_rate, window_size, interval_size):
+        self.model_file_path = "Hand/Backend/Resources/model.h5"
+        self.normalization_bounds_file_name = "Hand/Backend/Resources/normalization_bounds.csv"
+
+        self.sampling_rate = 10
+        self.window_size = 0.2
+        self.interval_size = 0.05
+
+    def start_prediction(self):
         """
         Starts the prediction thread.
-
-        :param model_file_name: The file name of the trained model.
-        :param min_vals: The minimum values of the features for normalization.
-        :param max_vals: The maximum values of the features for normalization.
-        :param sampling_rate: The sampling rate of the signal receiver.
-        :param window_size: The size of the window to be collected.
-        :param interval_size: The interval size between each collection
         """
         self.running = True
-        self.thread = threading.Thread(
-            target=self.predict,
-            args=(model_file_name, min_vals, max_vals, sampling_rate, window_size, interval_size,),
-            daemon=True
-        )
+        self.thread = threading.Thread(target=self.predict, daemon=True)
         self.thread.start()
-        logging.info("Predictor thread started.")
 
     def stop_prediction(self):
         """
@@ -53,45 +44,53 @@ class Predictor:
         if self.thread:
             self.thread.join()
 
-    def predict(self, model_file_name, min_vals, max_vals, sampling_rate, window_size, interval_size):
+    def predict(self):
         """
         Predicts the gesture using the trained model.
-
-        :param model_file_name: The file name of the trained model.
-        :param min_vals: The minimum values of the features for normalization.
-        :param max_vals: The maximum values of the features for normalization.
-        :param sampling_rate: The sampling rate of the signal receiver.
-        :param window_size: The size of the window to be collected.
-        :param interval_size: The interval size between each collection
         """
         try:
-            model = tf.keras.models.load_model(model_file_name)
+            model = tf.keras.models.load_model(self.model_file_path)
+            min_vals, max_vals = self.read_normalization_bounds()
             start_time = time.time()
 
             while self.running:
                 current_time = time.time()
                 elapsed_time = current_time - start_time
 
-                if elapsed_time >= interval_size:
-                    window = self.signal_receiver.get_last_n_signals(int(window_size * sampling_rate))
+                if elapsed_time >= self.interval_size:
+                    window = self.signal_receiver.get_last_n_signals(int(self.window_size * self.sampling_rate))
                     features = self.feature_extractor.extract_features(window)
-                    normalized_features = (features - min_vals) / (max_vals - min_vals)
+                    normalized_features = (features - min_vals) / (max_vals - min_vals + 1e-8)
                     normalized_features = normalized_features.reshape(1, -1)
-                    predictions = model.predict(normalized_features)
+                    predictions = model.predict(normalized_features, verbose=0)
 
-                    # Store the predictions safely
                     with self.buffer_lock:
                         self.last_prediction = predictions
 
-                    print("Predictions:", predictions)
+                    class_prediction = np.argmax(predictions)
+                    gesture_map = {0: "open", 1: "fist", 2: "peace", 3: "point", 4: "thumb"}
+                    gesture = gesture_map.get(class_prediction, "unknown")
+                    print(f"Predicted gesture: {gesture}")
 
                     start_time = current_time
 
         except Exception as e:
             with self.buffer_lock:
                 self.last_error = e
-            logging.error(f"Error in prediction thread: {e}")
-            self.running = False  # Stop the thread if there's an error
+            self.running = False
+    
+    def read_normalization_bounds(self):
+        '''
+        Read the min and max values of the features for normalization.
+
+        :param input_bounds_file_name: The name of the input bounds file.
+        '''
+        with open(self.normalization_bounds_file_name, mode='r', newline='') as file:
+            reader = csv.reader(file)
+            min_vals = next(reader)
+            max_vals = next(reader)
+
+        return np.array(min_vals, dtype=float), np.array(max_vals, dtype=float)
 
     def get_prediction(self):
         """
@@ -101,7 +100,6 @@ class Predictor:
         """
         with self.buffer_lock:
             if self.last_prediction is not None:
-                # Assuming the prediction is a probability distribution over classes
                 predicted_index = np.argmax(self.last_prediction)
                 return predicted_index
             else:
@@ -110,6 +108,3 @@ class Predictor:
     def get_error(self):
         with self.buffer_lock:
             return self.last_error
-
-
-            

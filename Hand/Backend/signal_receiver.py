@@ -1,10 +1,7 @@
-import sys
-sys.path.append('.')
-
 import threading, time
 from collections import deque
 import numpy as np
-from bleak import BleakClient
+from bleak import BleakClient, BleakScanner
 import asyncio
 
 class SignalReceiver:
@@ -17,18 +14,21 @@ class SignalReceiver:
         self.running = False
         self.thread = None
 
-        self.bt_address = "76FF84F4-9D42-7F49-B6BB-F2EA5F824A8D"
+        self.device_name = "MDT UART Service"
+        self.bt_address = ""
         self.CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
         self.client = BleakClient(self.bt_address)
         self.isBTRequested = False
+        self.devices = None
+        self.sampling_rate = 10
 
-    def start_reception(self, sampling_rate):
+    def start_reception(self):
         """
         Starts the signal reception thread.
         """
         self.isBTRequested = True
         self.running = True
-        self.thread = threading.Thread(target=self.run_async_receiver, args=(sampling_rate,), daemon=True)
+        self.thread = threading.Thread(target=self.run_async_receiver, daemon=True)
         self.thread.start()
             
     def stop_reception(self):
@@ -40,13 +40,13 @@ class SignalReceiver:
         if self.thread:
             self.thread.join()
 
-    def run_async_receiver(self, sampling_rate):
+    def run_async_receiver(self):
         """
         Runs the async bluetooth_receiver function in an event loop.
         """
-        asyncio.run(self.bluetooth_receiver(sampling_rate))
+        asyncio.run(self.bluetooth_receiver())
 
-    async def bluetooth_receiver(self, _):
+    async def bluetooth_receiver(self):
         async with BleakClient(self.bt_address) as client:
             if client.is_connected:
                 print(f"Connected to {self.bt_address}")
@@ -105,3 +105,21 @@ class SignalReceiver:
                 return np.array(list(self.signal_buffer)[-n:])
             else:
                 return None
+            
+    async def find_devices(self):
+        """
+        Scans for Bluetooth devices and stores the names and addresses of those called "MDT UART Service" in a list.
+        """
+        devices = await BleakScanner.discover()
+        self.devices = [(device.name, device.address) for device in devices if device.name == self.device_name]
+
+    async def set_device(self, device_name):
+        """
+        Sets the Bluetooth address based on the device name.
+
+        :param device_name: The name of the device to connect to.
+        """
+        for name, address in self.devices:
+            if name == device_name:
+                self.bt_address = address
+                return
