@@ -20,7 +20,7 @@ class SignalReceiver:
         self.client = BleakClient(self.bt_address)
         self.isBTRequested = False
         self.devices = None
-        self.sampling_rate = 100
+        self.sampling_rate = 10
 
     def start_reception(self):
         """
@@ -65,7 +65,7 @@ class SignalReceiver:
         """
         Continuously reads signals from the device.
         """
-        read_interval = 1.0 / self.sampling_rate
+        read_interval = 1.0 / 1000
 
         if self.running:
             start_time = time.time()

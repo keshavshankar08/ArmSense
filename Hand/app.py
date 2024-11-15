@@ -1,17 +1,20 @@
+import sys 
+sys.path.append('.')
+
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 import random
 import logging
-import sys 
 import serial
 import os
 import time
 from threading import Thread
 from collections import deque
 from logging.handlers import RotatingFileHandler
-import Hand.Backend.controller_backend as be
+from Hand.Backend.controller_backend import ControllerBackend
+import asyncio
 
-app = Flask(__name__, template_folder='Hand/Frontend/templates', static_folder='Hand/Frontend/static')
-backend = be.ControllerBackend()
+app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
+backend = ControllerBackend()
 
 # Set up logging
 handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=1)
@@ -99,13 +102,15 @@ def find_devices():
 def index():
     app.logger.info('Rendering index page')
     print("Index page rendered")
-    return render_template('Hand/Frontend/templates/index.html')
+    return render_template('index.html')
 
 @app.route('/pair', methods=['POST'])
 def pair():
     app.logger.info('Attempting to pair armband')
     try:
-        backend.signal_receiver.start_reception(10)  # Start Bluetooth connection
+        asyncio.run(backend.signal_receiver.find_devices())
+        asyncio.run(backend.signal_receiver.set_device("MDT UART Service"))
+        backend.signal_receiver.start_reception()  # Start Bluetooth connection
         time.sleep(10)
         # print(backend.signal_receiver.get_last_n_signals(2))
         # return jsonify({'success': True})
@@ -120,7 +125,7 @@ def pair():
 @app.route('/collection')
 def collection():
     app.logger.info('Rendering collection page')
-    return render_template('Hand/Frontend/templates/collection.html')
+    return render_template('collection.html')
 
 @app.route('/collect', methods=['POST'])
 def collect():
@@ -166,7 +171,7 @@ def data_collection():
     if request.method == 'POST':
         # Redirect to the next page in the sequence
         return redirect(url_for('peace_sign'))
-    return render_template('Hand/Frontend/templates/data_collection.html')
+    return render_template('data_collection.html')
 
 @app.route('/peace_sign', methods=['GET', 'POST'])
 def peace_sign():
@@ -174,7 +179,7 @@ def peace_sign():
     if request.method == 'POST':
         # Redirect to the next page in the sequence
         return redirect(url_for('pointing'))
-    return render_template('Hand/Frontend/templates/peace_sign.html')
+    return render_template('peace_sign.html')
 
 @app.route('/pointing', methods=['GET', 'POST'])
 def pointing():
@@ -182,7 +187,7 @@ def pointing():
     if request.method == 'POST':
         # Redirect to the next page in the sequence
         return redirect(url_for('thumbs_up'))
-    return render_template('Hand/Frontend/templates/pointing.html')
+    return render_template('pointing.html')
 
 @app.route('/thumbs_up', methods=['GET', 'POST'])
 def thumbs_up():
@@ -190,7 +195,7 @@ def thumbs_up():
     if request.method == 'POST':
         # Redirect back to collection page
         return redirect(url_for('collection'))
-    return render_template('Hand/Frontend/templates/thumbs_up.html')
+    return render_template('thumbs_up.html')
 
 @app.route('/start_collection', methods=['POST'])
 def start_collection():
@@ -201,30 +206,19 @@ def start_collection():
 
 @app.route('/stop_collection', methods=['POST'])
 def stop_collection():
-    # Stop data collection and save data
     backend.data_collector.stop_collection()
+    #backend.data_collector.stop_collection("Hand/Backend/Resources/data.csv")
     return jsonify({'success': True})
 
 @app.route('/train_model', methods=['POST'])
 def train_model():
     try:
-        # Define the base path for resources
-        base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Backend', 'Resources')
-
-        # Construct file paths
-        data_csv_path = os.path.join(base_path, 'data.csv')
-        cleaned_data_csv_path = os.path.join(base_path, 'cleaned_data.csv')
-        normalized_data_csv_path = os.path.join(base_path, 'normalized_data.csv')
-        normalize_bounds_csv_path = os.path.join(base_path, 'normalize_bounds.csv')
-        model_path = os.path.join(base_path, 'model.h5')
-
         # Data cleaning and normalization logic
-        backend.trainer.clean_data(data_csv_path, cleaned_data_csv_path)
-        backend.trainer.normalize_data(cleaned_data_csv_path, normalized_data_csv_path, normalize_bounds_csv_path)
+        backend.trainer.process_data()
         time.sleep(1)
 
         # Send training signal    
-        backend.trainer.train_model(normalized_data_csv_path, model_path)
+        backend.trainer.train_model()
         time.sleep(1)
         return jsonify({'success': True})
 
@@ -273,13 +267,8 @@ def send_serial_command(prediction_index):
 def continuous_prediction():
     global latest_prediction
     try:
-        base_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Backend', 'Resources')
-        normalize_bounds_csv_path = os.path.join(base_path, 'normalize_bounds.csv')
-        model_path = os.path.join(base_path, 'model.h5')
-
         # Perform model evaluation
-        min_vals, max_vals = backend.trainer.read_normalization_bounds(normalize_bounds_csv_path)
-        backend.predictor.start_prediction(model_path, min_vals, max_vals, 100, 0.2, 0.05)
+        backend.predictor.start_prediction()
         
         while True:
             # Check for errors in the predictor thread

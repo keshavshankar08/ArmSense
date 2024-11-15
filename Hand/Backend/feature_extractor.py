@@ -15,12 +15,12 @@ class FeatureExtractor:
 
         features = []
         for i in range(8):
-            features.append(round(self.rms(window_signals[:, i]), 2))
-            features.append(round(self.variance(window_signals[:, i]), 2))
-            features.append(round(self.mean_absolute_value(window_signals[:, i]), 2))
-            features.append(round(self.slope_sign_change(window_signals[:, i]), 2))
-            features.append(round(self.zero_crossing(window_signals[:, i]), 2))
-            features.append(round(self.waveform_length(window_signals[:, i]), 2))
+            features.append(float(f"{self.rms(window_signals[:, i]):.2f}"))
+            features.append(float(f"{self.variance(window_signals[:, i]):.2f}"))
+            features.append(float(f"{self.mean_absolute_value(window_signals[:, i]):.2f}"))
+            features.append(float(f"{self.slope_sign_change(window_signals[:, i]):.2f}"))
+            features.append(float(f"{self.zero_crossing(window_signals[:, i]):.2f}"))
+            features.append(float(f"{self.waveform_length(window_signals[:, i]):.2f}"))
 
         return features
 
