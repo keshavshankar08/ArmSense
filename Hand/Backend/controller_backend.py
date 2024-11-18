@@ -1,7 +1,7 @@
-import Hand.Backend.signal_receiver as sr
-import Hand.Backend.data_collector as dc
-import Hand.Backend.trainer as tr
-import Hand.Backend.predictor as pr
+import Backend.signal_receiver as sr
+import Backend.data_collector as dc
+import Backend.trainer as tr
+import Backend.predictor as pr
 
 class ControllerBackend:
     def __init__(self):

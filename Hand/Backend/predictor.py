@@ -1,4 +1,4 @@
-import Hand.Backend.feature_extractor as fe
+import Backend.feature_extractor as fe
 import csv
 import tensorflow as tf
 import time, threading

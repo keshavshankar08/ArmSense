@@ -1,4 +1,4 @@
-import Hand.Backend.feature_extractor as fe
+import Backend.feature_extractor as fe
 from collections import deque
 import time, threading
 import numpy as np
