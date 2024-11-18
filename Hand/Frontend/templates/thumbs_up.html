@@ -33,7 +33,7 @@
         <div class="instruction-container">
             <p>Please give a thumbs up when instructed. Repeat 3 times.</p>
             <img id="thumbsUpImage" src="{{ url_for('static', filename='thumbs_up_image.jpg') }}" alt="Person giving a thumbs up">
-            <div id="counter">Repetitions: <span id="repCount">0</span>/3</div>
+            <div id="counter">Repetitions: <span id="repCount">0</span>/10</div>
             <div id="message"></div>
             <button id="startButton" onclick="startCollection()">Start</button>
         </div>
@@ -42,8 +42,8 @@
     <script>
         const gestureClass = 3; // Set gesture class to 3 for "Thumbs Up"
         let repCount = 0;
-        const totalReps = 3;
-        const collectionDuration = 1000;
+        const totalReps = 10;
+        const collectionDuration = 2000;
 
         function startCollection() {
             document.getElementById('startButton').style.display = 'none';

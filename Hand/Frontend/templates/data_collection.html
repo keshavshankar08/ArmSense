@@ -33,7 +33,7 @@
         <div class="instruction-container">
             <p>Please make a fist when instructed. Repeat 3 times.</p>
             <img id="fistImage" src="{{ url_for('static', filename='fist_image.jpg') }}" alt="Person making a fist">
-            <div id="counter">Repetitions: <span id="repCount">0</span>/3</div>
+            <div id="counter">Repetitions: <span id="repCount">0</span>/10</div>
             <div id="message"></div>
             <button id="startButton" onclick="startCollection()">Start</button>
         </div>
@@ -42,8 +42,8 @@
     <script>
         const gestureClass = 0; // Assuming 'Make a Fist' is gesture class 0
         let repCount = 0;
-        const totalReps = 3;
-        const collectionDuration = 3000; // Duration for each data collection phase
+        const totalReps = 10;
+        const collectionDuration = 2000; // Duration for each data collection phase
     
         function startCollection() {
             document.getElementById('startButton').style.display = 'none';

@@ -1,3 +1,5 @@
+// script.js
+
 function log(functionName, purpose, error = null) {
     const message = `${functionName}: ${purpose}${error ? `, ERROR: ${error.message}` : ''}`;
     console.log(message);
@@ -94,106 +96,6 @@ function evaluateModel() {
     }
 }
 
-let charts = [];
-
-function initializeCharts() {
-    log('initializeCharts', 'Initializing charts');
-    try {
-        for (let i = 0; i < 8; i++) { // Initialize 8 charts (0-7)
-            const canvasId = `semgChart${i}`;
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) {
-                log('initializeCharts', `Canvas with ID ${canvasId} not found.`);
-                continue;
-            }
-            const ctx = canvas.getContext('2d');
-            charts.push(new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: `Channel ${i + 1}`,
-                        data: [],
-                        borderColor: `hsl(${45 * i}, 100%, 50%)`, // Distinct color for each channel
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: `Channel ${i + 1}`
-                        }
-                    },
-                    scales: {
-                        x: { 
-                            display: true,
-                            title: {
-                                display: true,
-                                text: 'Sample'
-                            },
-                            grid: {
-                                color: 'rgba(171,171,171,0.2)', // Optional: Customize grid color
-                                lineWidth: 1
-                            }
-                        },
-                        y: { 
-                            beginAtZero: true,
-                            display: true,
-                            title: {
-                                display: true,
-                                text: 'Amplitude'
-                            },
-                            grid: {
-                                color: 'rgba(171,171,171,0.2)', // Optional: Customize grid color
-                                lineWidth: 0.5
-                            }
-                        }
-                    }
-                }
-            }));
-        }
-        log('initializeCharts', 'Charts initialized successfully');
-    } catch (error) {
-        log('initializeCharts', 'Error initializing charts', error);
-    }
-}
-
-function updateCharts() {
-    log('updateCharts', 'Updating charts');
-    try {
-        fetch('/get_semg_data')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Data received:', data); // Debugging line
-                if (!data.data || !Array.isArray(data.data)) {
-                    log('updateCharts', 'Invalid data format received.');
-                    return;
-                }
-                charts.forEach((chart, index) => {
-                    const channelData = data.data[index] || [];
-                    chart.data.labels = channelData.map((_, i) => i);
-                    chart.data.datasets[0].data = channelData;
-                    chart.update();
-                });
-                log('updateCharts', 'Charts updated successfully');
-            })
-            .catch(error => {
-                log('updateCharts', 'Error fetching sEMG data', error);
-                console.error('Fetch error:', error); // Debugging line
-            });
-        setTimeout(updateCharts, 1000); // Update every second
-    } catch (error) {
-        log('updateCharts', 'Unexpected error', error);
-        console.error('Unexpected error:', error); // Debugging line
-    }
-}
-
 function collectData() {
     log('collectData', 'Collecting data');
     try {
@@ -233,5 +135,136 @@ function findDevices() {
         })
         .catch(error => {
             log('findDevices', 'Error finding devices', error);
+        });
+}
+
+// Global variables
+let charts = [];
+const maxDataPoints = 50; // Number of data points to display
+const channelDataArrays = []; // Array to store data arrays for each channel
+function initializeCharts() {
+    log('initializeCharts', 'Initializing charts');
+    try {
+        for (let i = 0; i < 8; i++) { // Initialize 8 charts (0-7)
+            const canvasId = `semgChart${i}`;
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                log('initializeCharts', `Canvas with ID ${canvasId} not found.`);
+                continue;
+            }
+            const ctx = canvas.getContext('2d');
+
+            // Initialize data array for each channel
+            channelDataArrays.push([]);
+
+            charts.push(new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [], // Start with empty labels
+                    datasets: [{
+                        label: `Channel ${i + 1}`,
+                        data: [],
+                        borderColor: `hsl(${45 * i}, 100%, 50%)`, // Distinct color for each channel
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    animation: false, // Disable animations for better performance
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { 
+                            type: 'linear',
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Sample'
+                            },
+                            grid: {
+                                color: 'rgba(171,171,171,0.2)',
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                minRotation: 0,
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 10
+                            }
+                        },
+                        y: { 
+                            beginAtZero: true,
+                            display: true,
+                            min: 0,       // Set the minimum value of the y-axis to 0
+                            max: 2000,    // Set the maximum value of the y-axis to 2000
+                            title: {
+                                display: true,
+                                text: 'Amplitude'
+                            },
+                            grid: {
+                                color: 'rgba(171,171,171,0.2)',
+                                lineWidth: 0.5
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: `Channel ${i + 1}`
+                        }
+                    }
+                }
+            }));
+        }
+        log('initializeCharts', 'Charts initialized successfully');
+    } catch (error) {
+        log('initializeCharts', 'Error initializing charts', error);
+    }
+}
+
+function updateCharts() {
+    log('updateCharts', 'Updating charts');
+    fetch('/get_semg_data')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Data received:', data); // Debugging line
+            if (!data.data || !Array.isArray(data.data)) {
+                log('updateCharts', 'Invalid data format received.');
+                // Schedule the next update
+                setTimeout(updateCharts, 50);
+                return;
+            }
+            for (let channelIndex = 0; channelIndex < 8; channelIndex++) {
+                const dataArray = channelDataArrays[channelIndex];
+
+                // Extract all the values for the current channel
+                const channelValues = data.data.map(reading => parseFloat(reading[channelIndex]) || 0);
+
+                // Append the new values to the channel's data array
+                dataArray.push(...channelValues);
+
+                // Keep only the latest maxDataPoints
+                while (dataArray.length > maxDataPoints) {
+                    dataArray.shift();
+                }
+
+                // Update the chart
+                const chart = charts[channelIndex];
+                chart.data.labels = dataArray.map((_, i) => i);
+                chart.data.datasets[0].data = dataArray;
+                chart.update('none');
+            }
+
+            log('updateCharts', 'Charts updated successfully');
+            // Schedule the next update
+            setTimeout(updateCharts, 50);
+        })
+        .catch(error => {
+            log('updateCharts', 'Error fetching sEMG data', error);
+            console.error('Fetch error:', error); // Debugging line
+            // Schedule the next update even if an error occurs
+            setTimeout(updateCharts, 50);
         });
 }

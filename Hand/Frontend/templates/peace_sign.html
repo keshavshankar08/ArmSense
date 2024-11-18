@@ -33,7 +33,7 @@
         <div class="instruction-container">
             <p>Please make a peace sign when instructed. Repeat 3 times.</p>
             <img id="peaceSignImage" src="{{ url_for('static', filename='peace_sign_image.jpg') }}" alt="Person making a peace sign">
-            <div id="counter">Repetitions: <span id="repCount">0</span>/3</div>
+            <div id="counter">Repetitions: <span id="repCount">0</span>/10</div>
             <div id="message"></div>
             <button id="startButton" onclick="startCollection()">Start</button>
         </div>
@@ -42,8 +42,8 @@
     <script>
         const gestureClass = 1; // Set gesture class to 1 for "Peace Sign"
         let repCount = 0;
-        const totalReps = 3;
-        const collectionDuration = 1000; // Duration in milliseconds
+        const totalReps = 10;
+        const collectionDuration = 2000; // Duration in milliseconds
 
         function startCollection() {
             document.getElementById('startButton').style.display = 'none';
