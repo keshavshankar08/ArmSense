@@ -14,7 +14,7 @@ import asyncio
 
 app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
 backend = ControllerBackend()
-signal_receiver = SignalReceiver()
+#signal_receiver = SignalReceiver()
 
 # Serial port configuration
 SERIAL_PORT = '/dev/ttyUSB1'
@@ -53,10 +53,10 @@ def find_devices():
     print('find_devices route called')
     try:
         # Run the asynchronous find_devices method
-        asyncio.run(signal_receiver.find_devices())
+        asyncio.run(backend.signal_receiver.find_devices())
         # Store the devices in the global list
         with found_devices_lock:
-            found_devices = signal_receiver.devices  # This should be a list of (name, address) tuples
+            found_devices = backend.signal_receiver.devices  # This should be a list of (name, address) tuples
         print('Devices found:', found_devices)
         devices_list = []
         for name, address in found_devices:
@@ -86,8 +86,8 @@ def set_device():
             return jsonify({'success': False, 'error': error_message}), 404
 
         # Set the device address in signal_receiver
-        signal_receiver.bt_address = device_address
-        signal_receiver.selected_device = (device_name, device_address)
+        backend.signal_receiver.bt_address = device_address
+        backend.signal_receiver.selected_device = (device_name, device_address)
         print(f'Device {device_name} set successfully with address {device_address}')
         return jsonify({'success': True})
     except Exception as e:
@@ -99,13 +99,13 @@ def set_device():
 def pair():
     print('pair route called')
     try:
-        if not hasattr(signal_receiver, 'selected_device') or not signal_receiver.selected_device:
+        if not hasattr(backend.signal_receiver, 'selected_device') or not backend.signal_receiver.selected_device:
             error_message = 'Device not set. Please select a device first.'
             print('Error in pair:', error_message)
             return jsonify({'success': False, 'error': error_message}), 400
 
         # Start the Bluetooth connection
-        signal_receiver.start_reception()
+        backend.signal_receiver.start_reception()
         print('Bluetooth reception started')
 
         # Implement any necessary synchronization or waiting here

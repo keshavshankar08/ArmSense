@@ -170,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 deviceDropdown.style.display = 'block';
                 pairDeviceButton.style.display = 'inline-block';
+
             } catch (error) {
                 console.error('Error finding devices:', error);
                 alert('Error finding devices.');
@@ -210,6 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Pairing error:', error);
             }
         });
+    }
+    if (window.location.pathname === '/collection') {
+        initializeCharts();
+        setInterval(updateCharts, 50); // Update charts every 1 second
     }
 });
 
@@ -411,8 +416,6 @@ function updateCharts() {
             console.log('Data received:', data); // Debugging line
             if (!data.data || !Array.isArray(data.data)) {
                 log('updateCharts', 'Invalid data format received.');
-                // Schedule the next update
-                setTimeout(updateCharts, 50);
                 return;
             }
             for (let channelIndex = 0; channelIndex < 8; channelIndex++) {
@@ -437,14 +440,10 @@ function updateCharts() {
             }
 
             log('updateCharts', 'Charts updated successfully');
-            // Schedule the next update
-            setTimeout(updateCharts, 50);
         })
         .catch(error => {
             log('updateCharts', 'Error fetching sEMG data', error);
             console.error('Fetch error:', error); // Debugging line
-            // Schedule the next update even if an error occurs
-            setTimeout(updateCharts, 50);
         });
 }
 

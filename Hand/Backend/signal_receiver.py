@@ -65,6 +65,7 @@ class SignalReceiver:
         """
         Continuously reads signals from the device.
         """
+        #print("Receiving signals ", data)
         read_interval = 1.0 / 1000
 
         if self.running:
