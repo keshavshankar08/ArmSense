@@ -1,36 +1,215 @@
-// script.js
-
 function log(functionName, purpose, error = null) {
     const message = `${functionName}: ${purpose}${error ? `, ERROR: ${error.message}` : ''}`;
     console.log(message);
-    // You can also send this log to the server if needed
     fetch('/log', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({ message }),
     }).catch(err => console.error('Failed to send log to server:', err));
 }
 
+// document.addEventListener('DOMContentLoaded', () => {
+//     try {
+//         console.log('Setting up event listeners');
+
+//         const findDevicesButton = document.getElementById('findDevicesButton');
+//         const deviceDropdown = document.getElementById('deviceDropdown');
+//         const pairDeviceButton = document.getElementById('pairDeviceButton');
+
+//         if (findDevicesButton) {
+//             findDevicesButton.addEventListener('click', async () => {
+//                 try {
+//                     const response = await fetch('/find_devices', { method: 'POST' });
+//                     const devices = await response.json();
+
+//                     if (devices.error) {
+//                         console.error('Error finding devices:', devices.error);
+//                         alert('Error finding devices.');
+//                         return;
+//                     }
+
+//                     populateDeviceDropdown(devices);
+//                 } catch (error) {
+//                     console.error('Error finding devices:', error);
+//                     alert('Error finding devices.');
+//                 }
+//             });
+//         }
+
+//         if (pairDeviceButton) {
+//             pairDeviceButton.addEventListener('click', async () => {
+//                 try {
+//                     const selectedDevice = deviceDropdown.value;
+//                     if (!selectedDevice) {
+//                         alert('Please select a device.');
+//                         return;
+//                     }
+//                     console.log('Selected device:', selectedDevice);
+
+//                     // Set the device
+//                     const setResponse = await fetch('/set_device', {
+//                         method: 'POST',
+//                         headers: { 'Content-Type': 'application/json' },
+//                         body: JSON.stringify({ device_name: selectedDevice }),
+//                     });
+//                     const setResult = await setResponse.json();
+
+//                     if (setResult.success) {
+//                         console.log('Device set successfully');
+//                         // After setting the device, call /pair
+//                         const pairResponse = await fetch('/pair', { method: 'POST' });
+//                         const pairResult = await pairResponse.json();
+
+//                         if (pairResult.success) {
+//                             console.log('Pairing successful, redirecting');
+//                             window.location.href = pairResult.redirect;
+//                         } else {
+//                             console.error('Pairing failed:', pairResult.error);
+//                             alert(`Pairing failed: ${pairResult.error}`);
+//                         }
+//                     } else {
+//                         console.error('Error setting device:', setResult.error);
+//                         alert(`Error setting device: ${setResult.error}`);
+//                     }
+//                 } catch (error) {
+//                     console.error('Error pairing device:', error);
+//                     alert('Error pairing device.');
+//                 }
+//             });
+//         }
+//     } catch (error) {
+//         console.error('Error initializing the script:', error);
+//     }
+//});
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     const findDevicesButton = document.getElementById('findDevicesButton');
+//     const deviceDropdown = document.getElementById('deviceDropdown');
+//     const pairDeviceButton = document.getElementById('pairDeviceButton');
+
+//     if (findDevicesButton) {
+//         findDevicesButton.addEventListener('click', async () => {
+//             try {
+//                 const response = await fetch('/find_devices', { method: 'POST' });
+//                 const devices = await response.json();
+
+//                 if (devices.error) {
+//                     console.error('Error finding devices:', devices.error);
+//                     alert('Error finding devices.');
+//                     return;
+//                 }
+
+//                 populateDeviceDropdown(devices);
+//             } catch (error) {
+//                 console.error('Error finding devices:', error);
+//                 alert('Error finding devices.');
+//             }
+//         });
+//     }
+
+//     if (pairDeviceButton) {
+//         pairDeviceButton.addEventListener('click', async () => {
+//             try {
+//                 const selectedDevice = deviceDropdown.value;
+//                 if (!selectedDevice) {
+//                     alert('Please select a device.');
+//                     return;
+//                 }
+
+//                 const setResponse = await fetch('/set_device', {
+//                     method: 'POST',
+//                     headers: { 'Content-Type': 'application/json' },
+//                     body: JSON.stringify({ device_name: selectedDevice }),
+//                 });
+//                 const setResult = await setResponse.json();
+
+//                 if (setResult.success) {
+//                     const pairResponse = await fetch('/pair', { method: 'POST' });
+//                     const pairResult = await pairResponse.json();
+
+//                     if (pairResult.success) {
+//                         window.location.href = pairResult.redirect;
+//                     } else {
+//                         alert(`Pairing failed: ${pairResult.error}`);
+//                     }
+//                 } else {
+//                     alert(`Setting device failed: ${setResult.error}`);
+//                 }
+//             } catch (error) {
+//                 alert('Error pairing device.');
+//                 console.error('Pairing error:', error);
+//             }
+//         });
+//     }
+// });
+
 document.addEventListener('DOMContentLoaded', () => {
-    try {
-        const pairButton = document.getElementById('pairButton');
-        const findDevicesButton = document.getElementById('findDevicesButton');
+    const findDevicesButton = document.getElementById('findDevicesButton');
+    const deviceDropdown = document.getElementById('deviceDropdown');
+    const pairDeviceButton = document.getElementById('pairDeviceButton');
 
-        if (pairButton) {
-            pairButton.addEventListener('click', pairArmband);
-        }
+    if (findDevicesButton) {
+        findDevicesButton.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/find_devices', { method: 'POST' });
+                const devices = await response.json();
 
-        if (findDevicesButton) {
-            findDevicesButton.addEventListener('click', findDevices);
-        }
+                if (devices.error) {
+                    console.error('Error finding devices:', devices.error);
+                    alert('Error finding devices.');
+                    return;
+                }
 
-        if (window.location.pathname === '/collection') {
-            initializeCharts();
-            updateCharts();
-        }
-        log('DOMContentLoaded', 'Event listener setup complete');
-    } catch (error) {
-        log('DOMContentLoaded', 'Error in setup', error);
+                deviceDropdown.innerHTML = ''; // Clear previous options
+                devices.forEach(device => {
+                    const option = document.createElement('option');
+                    option.value = device.name; // Use device name
+                    option.textContent = `${device.name} (${device.address})`;
+                    deviceDropdown.appendChild(option);
+                });
+
+                deviceDropdown.style.display = 'block';
+                pairDeviceButton.style.display = 'inline-block';
+            } catch (error) {
+                console.error('Error finding devices:', error);
+                alert('Error finding devices.');
+            }
+        });
+    }
+
+    if (pairDeviceButton) {
+        pairDeviceButton.addEventListener('click', async () => {
+            try {
+                const selectedDevice = deviceDropdown.value;
+                if (!selectedDevice) {
+                    alert('Please select a device.');
+                    return;
+                }
+
+                const setResponse = await fetch('/set_device', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ device_name: selectedDevice }),
+                });
+                const setResult = await setResponse.json();
+
+                if (setResult.success) {
+                    const pairResponse = await fetch('/pair', { method: 'POST' });
+                    const pairResult = await pairResponse.json();
+
+                    if (pairResult.success) {
+                        window.location.href = pairResult.redirect;
+                    } else {
+                        alert(`Pairing failed: ${pairResult.error}`);
+                    }
+                } else {
+                    alert(`Setting device failed: ${setResult.error}`);
+                }
+            } catch (error) {
+                alert('Error pairing device.');
+                console.error('Pairing error:', error);
+            }
+        });
     }
 });
 
@@ -267,4 +446,175 @@ function updateCharts() {
             // Schedule the next update even if an error occurs
             setTimeout(updateCharts, 50);
         });
+}
+
+document.getElementById('findDevicesButton').addEventListener('click', async () => {
+    try {
+        const response = await fetch('/find_devices', { method: 'POST' });
+        const devices = await response.json();
+
+        if (devices.success === false) {
+            console.error('Error finding devices:', devices.error);
+            alert(`Error finding devices: ${devices.error}`);
+            return;
+        }
+
+        const dropdown = document.getElementById('deviceDropdown');
+        dropdown.innerHTML = ''; // Clear existing options
+
+        if (Array.isArray(devices) && devices.length > 0) {
+            devices.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.name; // Set value to device name
+                option.textContent = `${device.name} (${device.address})`;
+                dropdown.appendChild(option);
+            });
+
+            dropdown.style.display = 'block';
+            document.getElementById('pairDeviceButton').style.display = 'block';
+            console.log('Devices found and dropdown populated');
+        } else {
+            console.log('No devices found.');
+            alert('No devices found.');
+        }
+    } catch (error) {
+        console.error('Error finding devices:', error);
+        alert('Error finding devices.');
+    }
+});
+
+// document.getElementById('pairDeviceButton').addEventListener('click', async () => {
+//     const dropdown = document.getElementById('deviceDropdown');
+//     const selectedDeviceName = dropdown.value;
+
+//     if (!selectedDeviceName) {
+//         alert('Please select a device.');
+//         return;
+//     }
+
+//     try {
+//         // Send the device name to the backend
+//         const response = await fetch('/set_device', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({ device_name: selectedDeviceName })
+//         });
+
+//         const data = await response.json();
+
+//         if (data.success) {
+//             console.log('Device set successfully');
+//             // Optionally, start pairing or redirect to another page
+//             // For example, redirect to collection.html
+//             window.location.href = 'collection.html';
+//         } else {
+//             console.error('Error setting device:', data.error);
+//             alert(`Error setting device: ${data.error}`);
+//         }
+//     } catch (error) {
+//         console.error('Error pairing device:', error);
+//         alert('Error pairing device.');
+//     }
+// });
+
+document.getElementById('pairDeviceButton').addEventListener('click', async () => {
+    const dropdown = document.getElementById('deviceDropdown');
+    const selectedDevice = dropdown.options[dropdown.selectedIndex].text; // Ensure correct device name
+
+    console.log('Selected device:', selectedDevice);
+
+    try {
+        const response = await fetch('/set_device', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ device_name: selectedDevice })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            console.log('Device set successfully');
+        } else {
+            console.error('Error setting device:', result.error);
+        }
+    } catch (error) {
+        console.error('Error pairing device:', error);
+    }
+});
+
+// Function to find devices
+function findDevices() {
+    fetch('/find_devices', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.devices && data.devices.length > 0) {
+            const deviceDropdown = document.getElementById('deviceDropdown');
+            deviceDropdown.style.display = 'block';
+            deviceDropdown.innerHTML = ''; // Clear existing options
+
+            data.devices.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.address;
+                option.text = device.name;
+                deviceDropdown.add(option);
+            });
+
+            // Show the 'Pair Device' button now that devices are listed
+            document.getElementById('pairDeviceButton').style.display = 'block';
+        } else {
+            console.error('No devices found');
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+// Function to set the selected device
+function setDevice() {
+    const deviceDropdown = document.getElementById('deviceDropdown');
+    const selectedDeviceName = deviceDropdown.value;
+
+    fetch('/set_device', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ device_name: selectedDeviceName })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Device set successfully');
+            // Enable the Pair Device button now that the device is set
+            document.getElementById('pairDeviceButton').disabled = false;
+        } else {
+            console.error('Failed to set device:', data.error);
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+// Add event listener to the device dropdown to call setDevice when a device is selected
+document.getElementById('deviceDropdown').addEventListener('change', setDevice);
+
+
+function populateDeviceDropdown(devices) {
+    deviceDropdown.innerHTML = '';
+    devices.forEach(device => {
+        const option = document.createElement('option');
+        option.value = device.name; // Use device name as value
+        option.textContent = `${device.name} (${device.address})`;
+        deviceDropdown.appendChild(option);
+    });
+    deviceDropdown.style.display = 'block';
+    pairDeviceButton.style.display = 'inline-block';
 }
