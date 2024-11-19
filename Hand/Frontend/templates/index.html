@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <title>Device Selection</title>
+    <!-- Include the stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Select a Device</h1>
-    <button id="findDevicesButton">Find Devices</button>
-    <select id="deviceDropdown" style="display:none;"></select>
-    <button id="pairDeviceButton" style="display:none;">Pair Device</button>
+    <div class="container">
+        <h1>Select a Device</h1>
+        
+        <div id="deviceContainer">
+            <button id="findDevicesButton" class="primary-button">Find Devices</button>
+            <select id="deviceDropdown" style="display:none;"></select>
+            <button id="pairDeviceButton" class="primary-button" style="display:none;">Pair Device</button>
+        </div>
 
-    <!-- Include script.js using Flask's url_for -->
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <!-- Include script.js -->
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+    </div>
 </body>
 </html>

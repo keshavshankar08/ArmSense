@@ -8,145 +8,11 @@ function log(functionName, purpose, error = null) {
     }).catch(err => console.error('Failed to send log to server:', err));
 }
 
-// document.addEventListener('DOMContentLoaded', () => {
-//     try {
-//         console.log('Setting up event listeners');
-
-//         const findDevicesButton = document.getElementById('findDevicesButton');
-//         const deviceDropdown = document.getElementById('deviceDropdown');
-//         const pairDeviceButton = document.getElementById('pairDeviceButton');
-
-//         if (findDevicesButton) {
-//             findDevicesButton.addEventListener('click', async () => {
-//                 try {
-//                     const response = await fetch('/find_devices', { method: 'POST' });
-//                     const devices = await response.json();
-
-//                     if (devices.error) {
-//                         console.error('Error finding devices:', devices.error);
-//                         alert('Error finding devices.');
-//                         return;
-//                     }
-
-//                     populateDeviceDropdown(devices);
-//                 } catch (error) {
-//                     console.error('Error finding devices:', error);
-//                     alert('Error finding devices.');
-//                 }
-//             });
-//         }
-
-//         if (pairDeviceButton) {
-//             pairDeviceButton.addEventListener('click', async () => {
-//                 try {
-//                     const selectedDevice = deviceDropdown.value;
-//                     if (!selectedDevice) {
-//                         alert('Please select a device.');
-//                         return;
-//                     }
-//                     console.log('Selected device:', selectedDevice);
-
-//                     // Set the device
-//                     const setResponse = await fetch('/set_device', {
-//                         method: 'POST',
-//                         headers: { 'Content-Type': 'application/json' },
-//                         body: JSON.stringify({ device_name: selectedDevice }),
-//                     });
-//                     const setResult = await setResponse.json();
-
-//                     if (setResult.success) {
-//                         console.log('Device set successfully');
-//                         // After setting the device, call /pair
-//                         const pairResponse = await fetch('/pair', { method: 'POST' });
-//                         const pairResult = await pairResponse.json();
-
-//                         if (pairResult.success) {
-//                             console.log('Pairing successful, redirecting');
-//                             window.location.href = pairResult.redirect;
-//                         } else {
-//                             console.error('Pairing failed:', pairResult.error);
-//                             alert(`Pairing failed: ${pairResult.error}`);
-//                         }
-//                     } else {
-//                         console.error('Error setting device:', setResult.error);
-//                         alert(`Error setting device: ${setResult.error}`);
-//                     }
-//                 } catch (error) {
-//                     console.error('Error pairing device:', error);
-//                     alert('Error pairing device.');
-//                 }
-//             });
-//         }
-//     } catch (error) {
-//         console.error('Error initializing the script:', error);
-//     }
-//});
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     const findDevicesButton = document.getElementById('findDevicesButton');
-//     const deviceDropdown = document.getElementById('deviceDropdown');
-//     const pairDeviceButton = document.getElementById('pairDeviceButton');
-
-//     if (findDevicesButton) {
-//         findDevicesButton.addEventListener('click', async () => {
-//             try {
-//                 const response = await fetch('/find_devices', { method: 'POST' });
-//                 const devices = await response.json();
-
-//                 if (devices.error) {
-//                     console.error('Error finding devices:', devices.error);
-//                     alert('Error finding devices.');
-//                     return;
-//                 }
-
-//                 populateDeviceDropdown(devices);
-//             } catch (error) {
-//                 console.error('Error finding devices:', error);
-//                 alert('Error finding devices.');
-//             }
-//         });
-//     }
-
-//     if (pairDeviceButton) {
-//         pairDeviceButton.addEventListener('click', async () => {
-//             try {
-//                 const selectedDevice = deviceDropdown.value;
-//                 if (!selectedDevice) {
-//                     alert('Please select a device.');
-//                     return;
-//                 }
-
-//                 const setResponse = await fetch('/set_device', {
-//                     method: 'POST',
-//                     headers: { 'Content-Type': 'application/json' },
-//                     body: JSON.stringify({ device_name: selectedDevice }),
-//                 });
-//                 const setResult = await setResponse.json();
-
-//                 if (setResult.success) {
-//                     const pairResponse = await fetch('/pair', { method: 'POST' });
-//                     const pairResult = await pairResponse.json();
-
-//                     if (pairResult.success) {
-//                         window.location.href = pairResult.redirect;
-//                     } else {
-//                         alert(`Pairing failed: ${pairResult.error}`);
-//                     }
-//                 } else {
-//                     alert(`Setting device failed: ${setResult.error}`);
-//                 }
-//             } catch (error) {
-//                 alert('Error pairing device.');
-//                 console.error('Pairing error:', error);
-//             }
-//         });
-//     }
-// });
-
 document.addEventListener('DOMContentLoaded', () => {
     const findDevicesButton = document.getElementById('findDevicesButton');
     const deviceDropdown = document.getElementById('deviceDropdown');
     const pairDeviceButton = document.getElementById('pairDeviceButton');
+    const homeButton = document.getElementById('homeButton');
 
     if (findDevicesButton) {
         findDevicesButton.addEventListener('click', async () => {
@@ -217,6 +83,26 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeCharts();
         updateCharts();
         setInterval(updateCharts, 50); // Update charts every 1 second
+    }
+    if (homeButton) {
+        homeButton.addEventListener('click', () => {
+            // Stop the model prediction
+            fetch('/stop_prediction', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Redirect to the collection page
+                        window.location.href = '/collection';
+                    } else {
+                        console.error('Error stopping prediction:', data.error);
+                        alert('Error stopping prediction. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error stopping prediction:', error);
+                    alert('An error occurred while stopping prediction. Please try again.');
+                });
+        });
     }
 });
 
@@ -483,42 +369,6 @@ document.getElementById('findDevicesButton').addEventListener('click', async () 
         alert('Error finding devices.');
     }
 });
-
-// document.getElementById('pairDeviceButton').addEventListener('click', async () => {
-//     const dropdown = document.getElementById('deviceDropdown');
-//     const selectedDeviceName = dropdown.value;
-
-//     if (!selectedDeviceName) {
-//         alert('Please select a device.');
-//         return;
-//     }
-
-//     try {
-//         // Send the device name to the backend
-//         const response = await fetch('/set_device', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify({ device_name: selectedDeviceName })
-//         });
-
-//         const data = await response.json();
-
-//         if (data.success) {
-//             console.log('Device set successfully');
-//             // Optionally, start pairing or redirect to another page
-//             // For example, redirect to collection.html
-//             window.location.href = 'collection.html';
-//         } else {
-//             console.error('Error setting device:', data.error);
-//             alert(`Error setting device: ${data.error}`);
-//         }
-//     } catch (error) {
-//         console.error('Error pairing device:', error);
-//         alert('Error pairing device.');
-//     }
-// });
 
 document.getElementById('pairDeviceButton').addEventListener('click', async () => {
     const dropdown = document.getElementById('deviceDropdown');

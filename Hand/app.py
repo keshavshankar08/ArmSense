@@ -266,6 +266,23 @@ def get_latest_prediction():
     global latest_prediction
     return jsonify({'predicted_gesture': latest_prediction})
 
+@app.route('/stop_prediction', methods=['POST'])
+def stop_prediction():
+    try:
+        backend.predictor.running = False
+        print("Set predictor running to False")
+        if backend.predictor.thread is not None and backend.predictor.thread.is_alive():
+            backend.predictor.thread.join(timeout=5)
+            print("Joined predictor thread")
+        else:
+            print("Predictor thread not alive")
+        #backend.predictor.stop_prediction()
+        print("Prediction stopped")
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+
 if __name__ == '__main__':
     print(app.url_map)
     app.run(debug=True)

@@ -17,7 +17,11 @@
     </script>
 </head>
 <body>
+    <div class="container"></div>
     <h1>Gesture Prediction</h1>
     <p>The predicted gesture is: <span id="predicted-gesture">{{ predicted_gesture }}</span></p>
+    <button id="homeButton" class="primary-button">Home</button>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html> 
