@@ -147,6 +147,11 @@ def get_semg_data():
     signals = backend.signal_receiver.get_last_n_signals(100)
     if signals is not None and len(signals) > 0:
         data = signals.tolist()
+        if len(data) < 100:
+            num_missing = 100 - len(data)
+            zero_padding = [[0] * 8 for _ in range(num_missing)]
+            data = data + zero_padding
+            print("Warning: Data length is less than 100")
         return jsonify({'data': data})
     else:
         return jsonify({'data': []})

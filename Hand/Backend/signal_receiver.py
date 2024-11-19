@@ -103,7 +103,7 @@ class SignalReceiver:
         """
         #change back to >= n
         with self.buffer_lock:
-            if len(self.signal_buffer) >= n//8:
+            if len(self.signal_buffer):
                 return np.array(list(self.signal_buffer)[-n:])
             else:
                 return None
