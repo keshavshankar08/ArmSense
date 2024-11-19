@@ -2,15 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Collection - Make a Peace Sign</title>
+    <title>Data Collection - Resting</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         .instruction-container {
             text-align: center;
             margin-top: 20px;
         }
-        #peaceSignImage {
+        #restingImage {
             max-width: 300px;
             margin: 20px auto;
             display: block;
@@ -28,11 +27,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>Data Collection: Make a Peace Sign</h1>
+        <h1>Data Collection: Resting</h1>
         
         <div class="instruction-container">
-            <p>Please make a peace sign when instructed. Repeat 3 times.</p>
-            <img id="peaceSignImage" src="{{ url_for('static', filename='peace_sign_image.jpg') }}" alt="Person making a peace sign">
+            <p>Please keep your hand relaxed when instructed. Repeat 10 times.</p>
+            <img id="restingImage" src="{{ url_for('static', filename='resting_image.jpg') }}" alt="Hand in resting position">
             <div id="counter">Repetitions: <span id="repCount">0</span>/10</div>
             <div id="message"></div>
             <button id="startButton" onclick="startCollection()">Start</button>
@@ -40,10 +39,10 @@
     </div>
 
     <script>
-        const gestureClass = 2; // Set gesture class to 1 for "Peace Sign"
+        const gestureClass = 0; // 'Resting' is gesture class 0
         let repCount = 0;
         const totalReps = 10;
-        const collectionDuration = 2000; // Duration in milliseconds
+        const collectionDuration = 2000; // Duration for each data collection phase (milliseconds)
 
         function startCollection() {
             document.getElementById('startButton').style.display = 'none';
@@ -54,7 +53,7 @@
             if (repCount < totalReps) {
                 repCount++;
                 document.getElementById('repCount').textContent = repCount;
-                document.getElementById('message').textContent = "Make a peace sign now!";
+                document.getElementById('message').textContent = "Rest now!";
 
                 // Start data collection
                 fetch('/start_collection', {
@@ -67,7 +66,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        console.log('Data collection started for gesture class 1');
+                        console.log('Data collection started');
                     } else {
                         console.error('Error starting data collection:', data.error);
                     }
@@ -76,8 +75,9 @@
                     console.error('Fetch error:', error);
                 });
 
+                // After collectionDuration milliseconds
                 setTimeout(() => {
-                    document.getElementById('message').textContent = "Relax your hand.";
+                    document.getElementById('message').textContent = "Prepare for next repetition.";
 
                     // Stop data collection
                     fetch('/stop_collection', {
@@ -98,23 +98,24 @@
                         console.error('Fetch error:', error);
                     });
 
+                    // Prepare for next repetition or finish
                     setTimeout(() => {
                         if (repCount < totalReps) {
-                            document.getElementById('message').textContent = "Prepare for next repetition...";
-                            setTimeout(collectData, 2000);
+                            collectData();
                         } else {
                             finishCollection();
                         }
-                    }, 2000);
-                }, collectionDuration);
+                    }, 2000); // Wait 2 seconds before next step
+
+                }, collectionDuration); // Wait for the collection duration before stopping
             }
         }
 
         function finishCollection() {
             document.getElementById('message').textContent = "Data collection complete!";
             setTimeout(() => {
-                window.location.href = "{{ url_for('pointing') }}";
-            }, 3000);
+                window.location.href = "{{ url_for('data_collection') }}";
+            }, 2000); 
         }
     </script>
 </body>

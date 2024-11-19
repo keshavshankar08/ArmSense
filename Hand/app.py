@@ -282,6 +282,9 @@ def stop_prediction():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/resting', methods=['GET', 'POST'])
+def resting():
+    return render_template('resting.html')
 
 if __name__ == '__main__':
     print(app.url_map)

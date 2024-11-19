@@ -14,7 +14,7 @@ class DataCollector:
         self.signal_receiver = signal_receiver
 
         self.feature_extractor = fe.FeatureExtractor()
-        self.feature_buffer = deque(maxlen=400)
+        self.feature_buffer = deque(maxlen=1000)
         self.buffer_lock = threading.Lock()
         self.running = False
         self.thread = None
