@@ -199,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const pairResult = await pairResponse.json();
 
                     if (pairResult.success) {
+                        updateCharts();
                         window.location.href = pairResult.redirect;
                     } else {
                         alert(`Pairing failed: ${pairResult.error}`);
@@ -214,6 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (window.location.pathname === '/collection') {
         initializeCharts();
+        updateCharts();
         setInterval(updateCharts, 50); // Update charts every 1 second
     }
 });

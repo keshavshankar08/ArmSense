@@ -101,8 +101,9 @@ class SignalReceiver:
         :param n: Number of recent signals to retrieve.
         :return: List of the last 'n' signals or None if insufficient data.
         """
+        #change back to >= n
         with self.buffer_lock:
-            if len(self.signal_buffer) >= n:
+            if len(self.signal_buffer) >= n//8:
                 return np.array(list(self.signal_buffer)[-n:])
             else:
                 return None

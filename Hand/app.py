@@ -145,7 +145,7 @@ def evaluate():
 @app.route('/get_semg_data')
 def get_semg_data():
     signals = backend.signal_receiver.get_last_n_signals(100)
-    if signals is not None:
+    if signals is not None and len(signals) > 0:
         data = signals.tolist()
         return jsonify({'data': data})
     else:
