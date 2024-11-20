@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.location.pathname === '/collection') {
         initializeCharts();
         updateCharts();
-        setInterval(updateCharts, 50); // Update charts every 1 second
+        setInterval(updateCharts, 50);
     }
     if (homeButton) {
         homeButton.addEventListener('click', () => {
@@ -192,8 +192,6 @@ function collectData() {
 
 function findDevices() {
     log('findDevices', 'Finding Bluetooth devices');
-    // Implement Bluetooth device discovery logic here
-    // This might involve calling a backend endpoint to start the Bluetooth scan
     fetch('/find_devices', { method: 'POST' })
         .then(response => response.json())
         .then(data => {
@@ -241,7 +239,7 @@ function initializeCharts() {
                     }]
                 },
                 options: {
-                    animation: false, // Disable animations for better performance
+                    animation: false,
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
@@ -428,7 +426,7 @@ function findDevices() {
         console.error('Error:', error);
     });
 }
-// Function to set the selected device
+
 function setDevice() {
     const deviceDropdown = document.getElementById('deviceDropdown');
     const selectedDeviceName = deviceDropdown.value;
@@ -454,7 +452,6 @@ function setDevice() {
         console.error('Error:', error);
     });
 }
-// Add event listener to the device dropdown to call setDevice when a device is selected
 document.getElementById('deviceDropdown').addEventListener('change', setDevice);
 
 

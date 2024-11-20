@@ -14,7 +14,6 @@ import asyncio
 
 app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
 backend = ControllerBackend()
-#signal_receiver = SignalReceiver()
 
 # Serial port configuration
 SERIAL_PORT = '/dev/ttyUSB1'
@@ -50,26 +49,22 @@ command_map = {
 @app.route('/find_devices', methods=['POST'])
 def find_devices():
     global found_devices  # Declare as global to modify the global variable
-    print('find_devices route called')
     try:
         # Run the asynchronous find_devices method
         asyncio.run(backend.signal_receiver.find_devices())
         # Store the devices in the global list
         with found_devices_lock:
             found_devices = backend.signal_receiver.devices  # This should be a list of (name, address) tuples
-        print('Devices found:', found_devices)
         devices_list = []
         for name, address in found_devices:
             devices_list.append({'name': name, 'address': address})
         return jsonify(devices_list)
     except Exception as e:
-        print('Error in find_devices:', e)
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/set_device', methods=['POST'])
 def set_device():
     global found_devices
-    print('set_device route called')
     try:
         data = request.json
         device_name = data.get('device_name')
@@ -82,51 +77,40 @@ def set_device():
 
         if not device_address:
             error_message = f'Device "{device_name}" not found in the list of discovered devices.'
-            print('Error in set_device:', error_message)
             return jsonify({'success': False, 'error': error_message}), 404
 
         # Set the device address in signal_receiver
         backend.signal_receiver.bt_address = device_address
         backend.signal_receiver.selected_device = (device_name, device_address)
-        print(f'Device {device_name} set successfully with address {device_address}')
         return jsonify({'success': True})
     except Exception as e:
-        print('Error in set_device:', e)
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/pair', methods=['POST'])
 def pair():
-    print('pair route called')
     try:
         if not hasattr(backend.signal_receiver, 'selected_device') or not backend.signal_receiver.selected_device:
             error_message = 'Device not set. Please select a device first.'
-            print('Error in pair:', error_message)
             return jsonify({'success': False, 'error': error_message}), 400
 
         # Start the Bluetooth connection
         backend.signal_receiver.start_reception()
-        print('Bluetooth reception started')
 
-        # Implement any necessary synchronization or waiting here
-        # For example, wait until connection is established
         time.sleep(2)  # Adjust the sleep time as needed
 
         redirect_url = url_for('collection')
         return jsonify({'success': True, 'redirect': redirect_url})
 
     except Exception as e:
-        print('Error in pair:', e)
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/')
 def index():
-    print("Index page rendered")
     return render_template('index.html')
 
 @app.route('/collection')
 def collection():
-    print("Collection page rendered")
     return render_template('collection.html')
 
 @app.route('/collect', methods=['POST'])
@@ -137,10 +121,10 @@ def collect():
 def train():
     return jsonify({'success': True})
 
-@app.route('/evaluate', methods=['POST'])
-def evaluate():
-    result = random.uniform(0.7, 0.99)  # Random accuracy between 70% and 99%
-    return jsonify({'result': f"{result:.2%}"})
+# @app.route('/evaluate', methods=['POST'])
+# def evaluate():
+#     result = random.uniform(0.7, 0.99)  # Random accuracy between 70% and 99%
+#     return jsonify({'result': f"{result:.2%}"})
 
 @app.route('/get_semg_data')
 def get_semg_data():
@@ -151,7 +135,6 @@ def get_semg_data():
             num_missing = 100 - len(data)
             zero_padding = [[0] * 8 for _ in range(num_missing)]
             data = data + zero_padding
-            print("Warning: Data length is less than 100")
         return jsonify({'data': data})
     else:
         return jsonify({'data': []})
@@ -193,7 +176,6 @@ def start_collection():
 
 @app.route('/stop_collection', methods=['POST'])
 def stop_collection():
-    print(data_buffers)
     backend.data_collector.stop_collection()
     return jsonify({'success': True})
 
@@ -230,7 +212,6 @@ def gesture_prediction():
 def send_serial_command(prediction_index):
     if ser and ser.is_open:
         command_value = command_map.get(prediction_index)
-        print(f"Command value: {command_value}")
         if command_value is not None:
             ser.write(f"{command_value}".encode())
             ser.flush()
@@ -271,15 +252,10 @@ def get_latest_prediction():
 def stop_prediction():
     try:
         backend.predictor.running = False
-        print("Set predictor running to False")
         if backend.predictor.thread is not None and backend.predictor.thread.is_alive():
             backend.predictor.thread.join(timeout=5)
-            print("Joined predictor thread")
         else:
-            print("Predictor thread not alive")
-        #backend.predictor.stop_prediction()
-        print("Prediction stopped")
-        return jsonify({'success': True})
+            return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
