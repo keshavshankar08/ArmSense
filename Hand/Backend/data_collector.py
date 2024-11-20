@@ -65,7 +65,7 @@ class DataCollector:
                 window = self.signal_receiver.get_last_n_signals(int(self.window_size * self.sampling_rate))
                 features = self.feature_extractor.extract_features(window)
                 features = np.append(features, gesture_class)
-                data = np.append(window, gesture_class)
+                data = np.append(window[:int(self.interval_size * self.sampling_rate)], gesture_class)
                 with self.buffer_lock:
                     self.feature_buffer.append(features)
                     self.data_buffer.append(data)
