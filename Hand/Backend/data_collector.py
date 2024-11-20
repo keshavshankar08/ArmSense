@@ -14,14 +14,17 @@ class DataCollector:
         self.signal_receiver = signal_receiver
 
         self.feature_extractor = fe.FeatureExtractor()
-        self.feature_buffer = deque(maxlen=1000)
         self.buffer_lock = threading.Lock()
         self.running = False
         self.thread = None
-        self.feature_data_file_name = "Backend/Resources/feature_data.csv"
-        self.sampling_rate = 10
+        self.feature_data_file_name = "Hand/Backend/Resources/feature_data.csv"
+        self.data_file_name = "Hand/Backend/Resources/data.csv"
+        self.sampling_rate = 100
         self.window_size = 0.2
         self.interval_size = 0.05
+        self.max_recording_time = 20
+        self.feature_buffer = deque(maxlen=int(self.window_size * self.sampling_rate * self.max_recording_time))
+        self.data_buffer = deque(maxlen=int(self.sampling_rate * self.max_recording_time))
 
     def start_collection(self, gesture_class):
         """
@@ -37,11 +40,10 @@ class DataCollector:
         """
         Stops the data collection thread.
         """
-        print("Stopping collection")
         self.running = False
         if self.thread:
             self.thread.join()
-        self.save_data(self.feature_data_file_name)
+        self.save_data()
 
     def collect_data(self, gesture_class):
         '''
@@ -49,6 +51,10 @@ class DataCollector:
 
         :param gesture_class: The class of the gesture to be collected.
         '''
+        with self.buffer_lock:
+            self.feature_buffer.clear()
+            self.data_buffer.clear()
+            
         start_time = time.time()
 
         while self.running:
@@ -59,11 +65,15 @@ class DataCollector:
                 window = self.signal_receiver.get_last_n_signals(int(self.window_size * self.sampling_rate))
                 features = self.feature_extractor.extract_features(window)
                 features = np.append(features, gesture_class)
+                data = window[:int(self.interval_size * self.sampling_rate), :]
+                gesture_column = np.full((data.shape[0], 1), gesture_class)
+                data = np.hstack((data, gesture_column))
                 with self.buffer_lock:
                     self.feature_buffer.append(features)
+                    self.data_buffer.append(data)
                 start_time = current_time
 
-    def save_data(self, output_data_file_name):
+    def save_data(self):
         '''
         Saves the collected data to a file.
 
@@ -71,10 +81,15 @@ class DataCollector:
         '''
         with self.buffer_lock:
             try:
-                with open(output_data_file_name, mode='a', newline='') as file:
+                with open(self.feature_data_file_name, mode='a', newline='') as file:
                     writer = csv.writer(file)
                     while self.feature_buffer:
                         writer.writerow(self.feature_buffer.popleft())
+                with open(self.data_file_name, mode='a', newline='') as file:
+                    writer = csv.writer(file)
+                    while self.data_buffer:
+                        for row in self.data_buffer.popleft():
+                            writer.writerow(row)
             except Exception as e:
                 return
             
@@ -85,5 +100,7 @@ class DataCollector:
         try:
             with open(self.feature_data_file_name, 'w') as file:
                 file.truncate(0)
+            with open(self.data_file_name, 'w') as file:
+                file.truncate(0)
         except Exception as e:
-            return
+            return 

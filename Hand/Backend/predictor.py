@@ -24,7 +24,7 @@ class Predictor:
         self.model_file_path = "Hand/Backend/Resources/model.h5"
         self.normalization_bounds_file_name = "Hand/Backend/Resources/normalization_bounds.csv"
 
-        self.sampling_rate = 10
+        self.sampling_rate = 100
         self.window_size = 0.2
         self.interval_size = 0.05
 
@@ -66,11 +66,6 @@ class Predictor:
 
                     with self.buffer_lock:
                         self.last_prediction = predictions
-
-                    class_prediction = np.argmax(predictions)
-                    gesture_map = {0: "open", 1: "fist", 2: "peace", 3: "point", 4: "thumb"}
-                    gesture = gesture_map.get(class_prediction, "unknown")
-                    print(f"Predicted gesture: {gesture}")
 
                     start_time = current_time
 

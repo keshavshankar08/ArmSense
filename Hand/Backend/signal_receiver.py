@@ -14,13 +14,13 @@ class SignalReceiver:
         self.running = False
         self.thread = None
 
-        self.device_name = "ArmSense" #"MDT UART Service"
+        self.device_name = "ArmSense2"
         self.bt_address = ""
         self.CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
         self.client = BleakClient(self.bt_address)
         self.isBTRequested = False
         self.devices = None
-        self.sampling_rate = 10
+        self.sampling_rate = 100
 
     def start_reception(self):
         """
@@ -53,10 +53,8 @@ class SignalReceiver:
                 await client.start_notify(self.CHARACTERISTIC_UUID, self.receive_signals)
 
             while client.is_connected:
-                # Keep the program running to continuously receive data
-                await asyncio.sleep(0.0001)  # Adjust the time as needed
+                await asyncio.sleep(0.0001)
 
-                # Stop receiving notifications
                 if not self.isBTRequested:
                     await client.stop_notify(self.CHARACTERISTIC_UUID)
                     await client.disconnect()
@@ -65,7 +63,6 @@ class SignalReceiver:
         """
         Continuously reads signals from the device.
         """
-        #print("Receiving signals ", data)
         read_interval = 1.0 / 1000
 
         if self.running:

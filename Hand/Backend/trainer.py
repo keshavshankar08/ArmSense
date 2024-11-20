@@ -1,11 +1,7 @@
-import sys
-sys.path.append('.')
-
 import csv
 import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
-import datetime
 
 class Trainer:
     def __init__(self):

@@ -1,15 +1,10 @@
-import sys 
-sys.path.append('.')
-
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 import random
 import serial
-import os
 import time
 from threading import Thread, Lock
 from collections import deque
 from Backend.controller_backend import ControllerBackend
-from Backend.signal_receiver import SignalReceiver
 import asyncio
 
 app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
