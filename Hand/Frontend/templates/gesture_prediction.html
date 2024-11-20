@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Gesture Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script>
         function fetchLatestPrediction() {
             fetch('/get_latest_prediction')
@@ -17,7 +18,11 @@
     </script>
 </head>
 <body>
-    <h1>Gesture Prediction</h1>
-    <p>The predicted gesture is: <span id="predicted-gesture">{{ predicted_gesture }}</span></p>
+    <div class="container">
+        <h1>Gesture Prediction</h1>
+        <p>The predicted gesture is: <span id="predicted-gesture">{{ predicted_gesture }}</span></p>
+        <button id="homeButton" class="primary-button">Home</button>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html> 
