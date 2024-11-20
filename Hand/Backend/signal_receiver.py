@@ -14,8 +14,8 @@ class SignalReceiver:
         self.running = False
         self.thread = None
 
-        self.device_name = "MDT UART Service"
-        self.bt_address = "D30A37C2-C07D-A102-A985-117F0676F72C"
+        self.device_name = "ArmSense" #"MDT UART Service"
+        self.bt_address = ""
         self.CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
         self.client = BleakClient(self.bt_address)
         self.isBTRequested = False
@@ -65,6 +65,7 @@ class SignalReceiver:
         """
         Continuously reads signals from the device.
         """
+        #print("Receiving signals ", data)
         read_interval = 1.0 / 1000
 
         if self.running:
@@ -100,8 +101,9 @@ class SignalReceiver:
         :param n: Number of recent signals to retrieve.
         :return: List of the last 'n' signals or None if insufficient data.
         """
+        #change back to >= n
         with self.buffer_lock:
-            if len(self.signal_buffer) >= n:
+            if len(self.signal_buffer):
                 return np.array(list(self.signal_buffer)[-n:])
             else:
                 return None
