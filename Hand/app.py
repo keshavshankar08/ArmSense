@@ -24,7 +24,7 @@ try:
     ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
 except serial.SerialException as e:
     ser = None  # Ensure ser is defined even if opening fails
-data_buffers = [deque(maxlen=100) for _ in range(8)]
+data_buffers = [deque(maxlen=1000) for _ in range(8)]
 found_devices = []
 found_devices_lock = Lock()
 
@@ -193,6 +193,7 @@ def start_collection():
 
 @app.route('/stop_collection', methods=['POST'])
 def stop_collection():
+    print(data_buffers)
     backend.data_collector.stop_collection()
     return jsonify({'success': True})
 

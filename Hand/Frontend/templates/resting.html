@@ -26,97 +26,91 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Data Collection: Resting</h1>
-        
-        <div class="instruction-container">
-            <p>Please keep your hand relaxed when instructed. Repeat 10 times.</p>
-            <img id="restingImage" src="{{ url_for('static', filename='resting_image.jpg') }}" alt="Hand in resting position">
-            <div id="counter">Repetitions: <span id="repCount">0</span>/10</div>
-            <div id="message"></div>
-            <button id="startButton" onclick="startCollection()">Start</button>
-        </div>
+    <div class="instruction-container">
+        <h1>Resting Position</h1>
+        <p>Please keep your hand in a resting position for 20 seconds.</p>
+        <img id="restingImage" src="{{ url_for('static', filename='images/IMG_0596.jpg') }}" alt="Resting Hand">
+        <div id="counter"></div>
+        <div id="message"></div>
     </div>
 
     <script>
-        const gestureClass = 0; // 'Resting' is gesture class 0
-        let repCount = 0;
-        const totalReps = 10;
-        const collectionDuration = 2000; // Duration for each data collection phase (milliseconds)
+        const gestureClass = 0; // Resting gesture class
+        const collectionDuration = 20000; // Duration in milliseconds (20 seconds)
 
         function startCollection() {
-            document.getElementById('startButton').style.display = 'none';
-            collectData();
+            document.getElementById('message').textContent = "Data collection in progress...";
+            startCountdown(collectionDuration / 1000); // Start countdown in seconds
+
+            // Start data collection
+            fetch('/start_collection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 'gesture_class': gestureClass })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Data collection started');
+                } else {
+                    console.error('Error starting data collection:', data.error);
+                    document.getElementById('message').textContent = "Error starting data collection.";
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                document.getElementById('message').textContent = "Error starting data collection.";
+            });
+
+            // Stop data collection after the specified duration
+            setTimeout(stopCollection, collectionDuration);
         }
 
-        function collectData() {
-            if (repCount < totalReps) {
-                repCount++;
-                document.getElementById('repCount').textContent = repCount;
-                document.getElementById('message').textContent = "Rest now!";
-
-                // Start data collection
-                fetch('/start_collection', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 'gesture_class': gestureClass })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log('Data collection started');
-                    } else {
-                        console.error('Error starting data collection:', data.error);
-                    }
-                })
-                .catch(error => {
-                    console.error('Fetch error:', error);
-                });
-
-                // After collectionDuration milliseconds
-                setTimeout(() => {
-                    document.getElementById('message').textContent = "Prepare for next repetition.";
-
-                    // Stop data collection
-                    fetch('/stop_collection', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log('Data collection stopped');
-                        } else {
-                            console.error('Error stopping data collection:', data.error);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Fetch error:', error);
-                    });
-
-                    // Prepare for next repetition or finish
+        function stopCollection() {
+            // Stop data collection
+            fetch('/stop_collection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('message').textContent = "Data collection complete!";
+                    // Redirect after 2 seconds
                     setTimeout(() => {
-                        if (repCount < totalReps) {
-                            collectData();
-                        } else {
-                            finishCollection();
-                        }
-                    }, 2000); // Wait 2 seconds before next step
-
-                }, collectionDuration); // Wait for the collection duration before stopping
-            }
+                        window.location.href = "{{ url_for('data_collection') }}";
+                    }, 2000);
+                } else {
+                    document.getElementById('message').textContent = "Failed to stop data collection.";
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                document.getElementById('message').textContent = "Error stopping data collection.";
+            });
         }
 
-        function finishCollection() {
-            document.getElementById('message').textContent = "Data collection complete!";
-            setTimeout(() => {
-                window.location.href = "{{ url_for('data_collection') }}";
-            }, 2000); 
+        function startCountdown(duration) {
+            let remainingTime = duration;
+            document.getElementById('counter').textContent = `Time remaining: ${remainingTime} seconds`;
+
+            let countdownInterval = setInterval(() => {
+                remainingTime--;
+                if (remainingTime > 0) {
+                    document.getElementById('counter').textContent = `Time remaining: ${remainingTime} seconds`;
+                } else {
+                    clearInterval(countdownInterval);
+                    document.getElementById('counter').textContent = "Time's up!";
+                }
+            }, 1000);
         }
+
+        // Start the collection when the page loads
+        window.onload = startCollection;
     </script>
 </body>
 </html>

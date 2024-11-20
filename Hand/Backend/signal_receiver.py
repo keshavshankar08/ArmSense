@@ -14,7 +14,7 @@ class SignalReceiver:
         self.running = False
         self.thread = None
 
-        self.device_name = "MDT UART Service"
+        self.device_name = "ArmSense" #"MDT UART Service"
         self.bt_address = ""
         self.CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
         self.client = BleakClient(self.bt_address)

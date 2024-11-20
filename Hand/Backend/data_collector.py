@@ -18,7 +18,7 @@ class DataCollector:
         self.buffer_lock = threading.Lock()
         self.running = False
         self.thread = None
-        self.feature_data_file_name = "Hand/Backend/Resources/feature_data.csv"
+        self.feature_data_file_name = "Backend/Resources/feature_data.csv"
         self.sampling_rate = 10
         self.window_size = 0.2
         self.interval_size = 0.05
@@ -37,6 +37,7 @@ class DataCollector:
         """
         Stops the data collection thread.
         """
+        print("Stopping collection")
         self.running = False
         if self.thread:
             self.thread.join()
