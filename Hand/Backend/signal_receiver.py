@@ -20,7 +20,7 @@ class SignalReceiver:
         self.client = BleakClient(self.bt_address)
         self.isBTRequested = False
         self.devices = None
-        self.sampling_rate = 10
+        self.sampling_rate = 100
 
     def start_reception(self):
         """
