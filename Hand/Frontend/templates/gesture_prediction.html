@@ -9,7 +9,31 @@
             fetch('/get_latest_prediction')
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('predicted-gesture').innerText = data.predicted_gesture;
+                    const gesture = data.predicted_gesture;
+                    document.getElementById('predicted-gesture').innerText = gesture;
+                    
+                    // Update the image based on the predicted gesture
+                    const imageElement = document.getElementById('gesture-image');
+                    switch (gesture) {
+                        case 'Resting':
+                            imageElement.src = "{{ url_for('static', filename='images/IMG_0599.jpg') }}";
+                            break;
+                        case 'Fist':
+                            imageElement.src = "{{ url_for('static', filename='images/IMG_0600.jpg') }}";
+                            break;
+                        case 'Peace Sign':
+                            imageElement.src = "{{ url_for('static', filename='images/IMG_0601.jpg') }}";
+                            break;
+                        case 'Pointing':
+                            imageElement.src = "{{ url_for('static', filename='images/IMG_0602.jpg') }}";
+                            break;
+                        case 'Thumbs Up':
+                            imageElement.src = "{{ url_for('static', filename='images/IMG_0603.jpg') }}";
+                            break;
+                        default:
+                            imageElement.src = "{{ url_for('static', filename='images/IMG_0599.jpg') }}";
+                            break;
+                    }
                 })
                 .catch(error => console.error('Error fetching latest prediction:', error));
         }
@@ -21,6 +45,7 @@
     <div class="container">
         <h1>Gesture Prediction</h1>
         <p>The predicted gesture is: <span id="predicted-gesture">{{ predicted_gesture }}</span></p>
+        <img id="gesture-image" src="{{ url_for('static', filename='images/IMG_0599.jpg') }}" alt="Gesture Image" />
         <button id="homeButton" class="primary-button">Home</button>
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
