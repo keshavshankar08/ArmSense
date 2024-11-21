@@ -95,7 +95,7 @@ void setup() {
   Serial.begin(115200);
 
   // Create the BLE Device
-  BLEDevice::init("MDT UART Service");
+  BLEDevice::init("ArmSense1");
 
   // Create the BLE Server
   pServer = BLEDevice::createServer();

@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+#include <FastLED.h>
+
 #include "MCP3208.h"
 #include "string.h"
 
@@ -25,6 +27,7 @@ MCP3208 adc;
 
 int count = 0;
 
+
 //Callback for the bluetooth server. 
 class MyServerCallbacks : public BLEServerCallbacks {
   void onConnect(BLEServer *pServer) {
@@ -36,14 +39,27 @@ class MyServerCallbacks : public BLEServerCallbacks {
   }
 };
 
+//============================== FastLED Definitions ==============================
+#define NUM_LEDS 1
+#define DATA_PIN 26
+CRGB leds[NUM_LEDS];
+//=============================================================================
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   while (!Serial);
 
+  //============================== Debug LED SETUP ==============================
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);  
+  leds[0] = CRGB::Black;
+  FastLED.setBrightness(50);
+  FastLED.show();
+  //=============================================================================
+
   //============================== BLUETOOTH SETUP ==============================
   // Create the BLE Device
-  BLEDevice::init("UART Service");
+  BLEDevice::init("ArmSense");
 
   // Create the BLE Server
   pServer = BLEDevice::createServer();
@@ -63,19 +79,29 @@ void setup() {
   // Start advertising
   pServer->getAdvertising()->start();
   Serial.println("Waiting a client connection to notify...");
+
+  leds[0] = CRGB::LightBlue;  //BT Setup
+  FastLED.show();
+  delay(100);
   //=============================================================================
 
 
-
+  //=================================== ADC SETUP ==============================
   /// Hardware SPI (specify CS, use any available digital pin)
   /// Can use defaults if available, 
   /// ex: UNO (SS=10), Huzzah (SS=15), Feather 32u4 (SS=17) or M0 (SS=16)
   adc.begin(5);
   adc.analogReadResolution(12);
+  leds[0] = CRGB::Navy;  //ADC Setup
+  FastLED.show();
+  delay(100);
+  //=============================================================================
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  // leds[0] = CRGB::Black;  //Loop Blink
+  // FastLED.show();
 
   // get ADC data and concatnate to string 
   String test = "";
@@ -86,8 +112,8 @@ void loop() {
   }
   test += ".";
 
-  Serial.print("["); Serial.print(count); Serial.println("]");
-  count++;
+  // Serial.print("["); Serial.print(count); Serial.println("]");
+  // count++;
 
   //================Bluetooth Code==================
   std::string payload = test.c_str();
@@ -97,7 +123,15 @@ void loop() {
     pTxCharacteristic->setValue(payload);  //String value
     pTxCharacteristic->notify();
     txValue++;
+
+    // leds[0] = CRGB::Green;  //Running BT 
+    // FastLED.show();
     // delay(1);  // bluetooth stack will go into congestion, if too many packets are sent
+  }
+  else
+  {
+    leds[0] = CRGB::DarkRed;  //Running BT 
+    FastLED.show();
   }
 
   // disconnecting
@@ -106,6 +140,9 @@ void loop() {
     pServer->startAdvertising();  // restart advertising
     Serial.println("start advertising");
     oldDeviceConnected = deviceConnected;
+
+    leds[0] = CRGB::Red;  //ADC Setup
+    FastLED.show();
   }
   // connecting
   if (deviceConnected && !oldDeviceConnected) {
