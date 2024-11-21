@@ -39,72 +39,11 @@ class MyServerCallbacks : public BLEServerCallbacks {
   }
 };
 
-
-//=================================== GLOBAL VARS ==============================
-String adcData = "";
-//=================================== GLOBAL VARS ==============================
-
 //============================== FastLED Definitions ==============================
 #define NUM_LEDS 1
 #define DATA_PIN 26
 CRGB leds[NUM_LEDS];
 //=============================================================================
-
-//============================== RTOS BT Setup ==============================
-//Send bluetooth data based on params passed in
-void sendBluetoothData(void *param)
-{
-  for(;;)
-  {
-    String *data = (String*) param;
-    std::string payload = data->c_str();
-    if (deviceConnected) {
-      pTxCharacteristic->setValue(payload);  //String value
-      pTxCharacteristic->notify();
-      // txValue++;
-    }
-
-    // disconnecting
-    if (!deviceConnected && oldDeviceConnected) {
-      delay(500);                   // give the bluetooth stack the chance to get things ready
-      pServer->startAdvertising();  // restart advertising
-      Serial.println("start advertising");
-      oldDeviceConnected = deviceConnected;
-    }
-    // connecting
-    if (deviceConnected && !oldDeviceConnected) {
-      // do stuff here on connecting
-      oldDeviceConnected = deviceConnected;
-    }
-
-    vTaskDelay(7 / portTICK_PERIOD_MS);  // bluetooth stack will go into congestion, if too many packets are sent
-  }
-
-}
-//============================== RTOS BT Setup ==============================
-
-
-//============================== RTOS ADC Setup ==============================
-//Send bluetooth data based on params passed in
-void getADCData(void *param)
-{
-  for(;;)
-  {
-    // get ADC data and concatnate to string 
-    adcData = "";
-    for (int chan=0; chan<8; chan++) {
-      // Serial.print(adc.analogRead(chan)); Serial.print("\t");
-      adcData += String(adc.analogRead(chan));
-      adcData += ",";
-    }
-    adcData += ".";
-
-    vTaskDelay(10 / portTICK_PERIOD_MS);  // bluetooth stack will go into congestion, if too many packets are sent
-  }
-
-}
-//============================== RTOS ADC Setup ==============================
-
 
 void setup() {
   // put your setup code here, to run once:
@@ -157,55 +96,6 @@ void setup() {
   FastLED.show();
   delay(100);
   //=============================================================================
-
-  // //=================================== FREERTOS SETUP BT ==============================
-  // xTaskCreatePinnedToCore
-  // (
-  //   sendBluetoothData,
-  //   "Send BT Data",
-  //   4096,
-  //   &adcData,
-  //   1,
-  //   NULL,
-  //   0
-  // );
-  // //=================================== FREERTOS SETUP BT ==============================
-
-  // //=================================== FREERTOS SETUP ADC ==============================
-  // xTaskCreatePinnedToCore
-  // (
-  //   getADCData,
-  //   "Send BT Data",
-  //   8192,
-  //   NULL,
-  //   2,
-  //   NULL,
-  //   1
-  // );
-  // //=================================== FREERTOS SETUP ADC ==============================
-    //=================================== FREERTOS SETUP BT ==============================
-  xTaskCreate
-  (
-    sendBluetoothData,
-    "Send BT Data",
-    4096,
-    &adcData,
-    1,
-    NULL
-  );
-  //=================================== FREERTOS SETUP BT ==============================
-
-  //=================================== FREERTOS SETUP ADC ==============================
-  xTaskCreate
-  (
-    getADCData,
-    "Send BT Data",
-    8192,
-    NULL,
-    2,
-    NULL
-  );
-  //=================================== FREERTOS SETUP ADC ==============================
 }
 
 void loop() {
@@ -213,30 +103,53 @@ void loop() {
   // leds[0] = CRGB::Black;  //Loop Blink
   // FastLED.show();
 
-  //   // disconnecting
-  // if (!deviceConnected && oldDeviceConnected) {
-  //   delay(500);                   // give the bluetooth stack the chance to get things ready
-  //   pServer->startAdvertising();  // restart advertising
-  //   Serial.println("start advertising");
-  //   oldDeviceConnected = deviceConnected;
-  // }
-  // // connecting
-  // if (deviceConnected && !oldDeviceConnected) {
-  //   // do stuff here on connecting
-  //   oldDeviceConnected = deviceConnected;
-  // }
-
-  // // get ADC data and concatnate to string 
-  // adcData = "";
-  // for (int chan=0; chan<8; chan++) {
-  //   // Serial.print(adc.analogRead(chan)); Serial.print("\t");
-  //   adcData += String(adc.analogRead(chan));
-  //   adcData += ",";
-  // }
-  // adcData += ".";
+  // get ADC data and concatnate to string 
+  String test = "";
+  for (int chan=0; chan<8; chan++) {
+    // Serial.print(adc.analogRead(chan)); Serial.print("\t");
+    test += String(adc.analogRead(chan));
+    test += ",";
+  }
+  test += ".";
 
   // Serial.print("["); Serial.print(count); Serial.println("]");
   // count++;
+
+  //================Bluetooth Code==================
+  std::string payload = test.c_str();
+  // std::string payload = "Test";
+  if (deviceConnected) {
+    // pTxCharacteristic->setValue(&txValue, 0x56);
+    pTxCharacteristic->setValue(payload);  //String value
+    pTxCharacteristic->notify();
+    txValue++;
+
+    leds[0] = CRGB::Green;  //Running BT 
+    FastLED.show();
+    // delay(1);  // bluetooth stack will go into congestion, if too many packets are sent
+  }
+  else
+  {
+    leds[0] = CRGB::DarkRed;  //Running BT 
+    FastLED.show();
+  }
+
+  // disconnecting
+  if (!deviceConnected && oldDeviceConnected) {
+    delay(500);                   // give the bluetooth stack the chance to get things ready
+    pServer->startAdvertising();  // restart advertising
+    Serial.println("start advertising");
+    oldDeviceConnected = deviceConnected;
+
+    leds[0] = CRGB::Red;  //ADC Setup
+    FastLED.show();
+  }
+  // connecting
+  if (deviceConnected && !oldDeviceConnected) {
+    // do stuff here on connecting
+    oldDeviceConnected = deviceConnected;
+  }
+  //================================================
   
-  // delay(1);
+  delay(8);
 }
