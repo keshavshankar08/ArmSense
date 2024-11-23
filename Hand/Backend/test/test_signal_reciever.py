@@ -44,11 +44,21 @@ signal = SignalReceiver()
 
 # run = asyncio.create_task(signal.start_reception())
 # signal.start_reception()
-# signal.start_reception(100)
-signal.connect()
-print("After Start")
-
+signal.start_reception(100)
+# signal.connect()
+while not signal.client.is_connected:
+    time.sleep(0.001)
+    print("Waiting for subscription")
+    # print(signal.running)
+print("Started Reception")
+signal.counter = 0
 time.sleep(20)
+print(signal.counter)
+print("Stopping Reception")
+signal.stop_reception()
+print("Stopped Reception")
+
+# time.sleep(20)
 
 # signal.stop_reception()
 

@@ -25,7 +25,22 @@ uint8_t txValue = 0;
 
 MCP3208 adc;
 
+//=================================== PROTOTYPES ===============================
+void getADCData();
+void sendBTData();
+//=================================== PROTOTYPES ===============================
+
+
+//=================================== GLOBAL DEFS ==============================
+#define INTERVAL 8
+//=================================== GLOBAL DEFS ==============================
+
+//=================================== GLOBAL VARS ==============================
 int count = 0;
+String adcData = "";
+unsigned long previousTime = 0; 
+bool transmitFailed = false;
+//=================================== GLOBAL VARS ==============================
 
 
 //Callback for the bluetooth server. 
@@ -39,11 +54,24 @@ class MyServerCallbacks : public BLEServerCallbacks {
   }
 };
 
+void gattsEventCallback(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t* param) {
+    if (event == ESP_GATTS_CONF_EVT) {
+        if (param->conf.status != ESP_GATT_OK) {
+          Serial.printf("Notification failed with status: %d\n", param->conf.status);
+          transmitFailed = true;
+        }
+        else if (param->conf.status == ESP_GATT_OK)
+        {
+          transmitFailed = false;
+        }
+    }
+}
+
 //============================== FastLED Definitions ==============================
 #define NUM_LEDS 1
 #define DATA_PIN 26
 CRGB leds[NUM_LEDS];
-//=============================================================================
+//========================== End FastLED Definitions ==============================
 
 void setup() {
   // put your setup code here, to run once:
@@ -55,6 +83,7 @@ void setup() {
   leds[0] = CRGB::Black;
   FastLED.setBrightness(50);
   FastLED.show();
+  Serial.println("Firmware Version: 0.1");
   //=============================================================================
 
   //============================== BLUETOOTH SETUP ==============================
@@ -103,20 +132,39 @@ void loop() {
   // leds[0] = CRGB::Black;  //Loop Blink
   // FastLED.show();
 
-  // get ADC data and concatnate to string 
-  String test = "";
-  for (int chan=0; chan<8; chan++) {
-    // Serial.print(adc.analogRead(chan)); Serial.print("\t");
-    test += String(adc.analogRead(chan));
-    test += ",";
+  unsigned long currentTime = millis();
+
+  if(currentTime-previousTime>INTERVAL)
+  {
+    //Get ADC Data
+    getADCData();
+    //================Bluetooth Code==================
+    sendBTData();
+    //================================================
+
+    if(!transmitFailed)
+    {
+      previousTime = currentTime;
+    }
   }
-  test += ".";
+}
+
+void getADCData()
+{
+  // get ADC data and concatnate to string 
+  adcData = "";
+  for (int chan=0; chan<8; chan++) {
+    adcData += String(adc.analogRead(chan));
+    adcData += ",";
+  }
+  adcData += ".";
 
   // Serial.print("["); Serial.print(count); Serial.println("]");
-  // count++;
+}
 
-  //================Bluetooth Code==================
-  std::string payload = test.c_str();
+void sendBTData()
+{
+    std::string payload = adcData.c_str();
   // std::string payload = "Test";
   if (deviceConnected) {
     // pTxCharacteristic->setValue(&txValue, 0x56);
@@ -149,7 +197,4 @@ void loop() {
     // do stuff here on connecting
     oldDeviceConnected = deviceConnected;
   }
-  //================================================
-  
-  delay(8);
 }
