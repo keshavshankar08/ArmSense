@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pairDeviceButton = document.getElementById('pairDeviceButton');
     const homeButton = document.getElementById('homeButton');
     const evaluateButton = document.getElementById('evaluateButton');
+    const disconnectButton = document.getElementById('disconnectButton');
 
     if (findDevicesButton) {
         findDevicesButton.addEventListener('click', async () => {
@@ -102,6 +103,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(error => {
                     console.error('Error stopping prediction:', error);
                     alert('An error occurred while stopping prediction. Please try again.');
+                });
+        });
+    }
+    if (disconnectButton) {
+        disconnectButton.addEventListener('click', () => {
+            fetch('/disconnect', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/';
+                    } else {
+                        console.error('Error disconnecting:', data.error);
+                        alert('Error disconnecting. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error disconnecting:', error);
+                    alert('An error occurred while disconnecting. Please try again.');
                 });
         });
     }

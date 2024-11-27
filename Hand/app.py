@@ -266,6 +266,14 @@ def check_model():
     model_exists = os.path.exists('Hand/Backend/Resources/model.h5')
     return jsonify({'modelAvailable': model_exists})
 
+@app.route('/disconnect', methods=['POST'])
+def disconnect():
+    try:
+        backend.signal_receiver.stop_reception()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 if __name__ == '__main__':
     print(app.url_map)
     app.run(debug=True)
