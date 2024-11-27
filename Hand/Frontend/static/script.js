@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deviceDropdown = document.getElementById('deviceDropdown');
     const pairDeviceButton = document.getElementById('pairDeviceButton');
     const homeButton = document.getElementById('homeButton');
+    const evaluateButton = document.getElementById('evaluateButton');
 
     if (findDevicesButton) {
         findDevicesButton.addEventListener('click', async () => {
@@ -104,6 +105,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
         });
     }
+    fetch('check_model')
+        .then(response => response.json())
+        .then(data => {
+            if (data.modelAvailable) {
+                evaluateButton.disabled = false;
+            }
+            else {
+                evaluateButton.disabled = true;
+            }
+        })
+        .catch(error => console.error('Error checking model:', error));
 });
 
 function pairArmband() {
@@ -130,8 +142,10 @@ function pairArmband() {
 }
 
 function trainModel() {
-    log('trainModel', 'Training model');
+    //log('trainModel', 'Training model');
     try {
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => button.disabled = true);
         fetch('/train', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
@@ -146,6 +160,7 @@ function trainModel() {
             .catch(error => {
                 log('trainModel', 'Error during model training', error);
             });
+        buttons.forEach(button => button.disabled = false);
     } catch (error) {
         log('trainModel', 'Unexpected error', error);
     }

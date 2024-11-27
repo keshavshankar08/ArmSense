@@ -6,6 +6,9 @@ from threading import Thread, Lock
 from collections import deque
 from Backend.controller_backend import ControllerBackend
 import asyncio
+import bleak
+from statistics import mode
+import os
 
 app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
 backend = ControllerBackend()
@@ -257,6 +260,11 @@ def stop_prediction():
 @app.route('/resting', methods=['GET', 'POST'])
 def resting():
     return render_template('resting.html')
+
+@app.route('/check_model', methods=['GET'])
+def check_model():
+    model_exists = os.path.exists('Hand/Backend/Resources/model.h5')
+    return jsonify({'modelAvailable': model_exists})
 
 if __name__ == '__main__':
     print(app.url_map)
