@@ -51,9 +51,6 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
-void sendBluetoothData(String);
-String generateFakeADC();
-
 BLEServer *pServer = NULL;
 BLECharacteristic *pTxCharacteristic;
 bool deviceConnected = false;
@@ -94,37 +91,11 @@ class MyCallbacks : public BLECharacteristicCallbacks {
   }
 };
 
-void dataParameter()
-{
-
-}
-
-//Send bluetooth data based on params passed in
-void sendBluetoothData(void *param)
-{
-  for(;;)
-  {
-    String *data = (String*) param;
-    std::string payload = data->c_str();
-    if (deviceConnected) {
-      pTxCharacteristic->setValue(payload);  //String value
-      pTxCharacteristic->notify();
-      // txValue++;
-    }
-    vTaskDelay(10 / portTICK_PERIOD_MS);  // bluetooth stack will go into congestion, if too many packets are sent
-  }
-
-}
-
-//Global Vars
-String adcData = "";
-
 void setup() {
-
   Serial.begin(115200);
 
   // Create the BLE Device
-  BLEDevice::init("RF UART Service");
+  BLEDevice::init("ArmSense1");
 
   // Create the BLE Server
   pServer = BLEDevice::createServer();
@@ -148,18 +119,6 @@ void setup() {
   // Start advertising
   pServer->getAdvertising()->start();
   Serial.println("Waiting a client connection to notify...");
-
-  //Setup FREERTOS 
-  xTaskCreatePinnedToCore
-  (
-    sendBluetoothData,
-    "Send BT Data",
-    4096,
-    &adcData,
-    1,
-    NULL,
-    1
-  );
 }
 
 const int numChannels = 8;
@@ -168,30 +127,61 @@ const int noiseLevel = 50;
 
 unsigned long lastToggleTime = 0;
 bool signalOn = false;
+int counter = 0;
 
 void loop() {
 
-  // unsigned long currentTime = millis();
+  unsigned long currentTime = millis();
 
-  // if (currentTime - lastToggleTime >= signalDuration) {
-  //   signalOn = !signalOn;
-  //   lastToggleTime = currentTime;
-  // }
+  if (currentTime - lastToggleTime >= 5000) {
+    counter++;
+    if (counter>4)
+    {
+      counter = 0; 
+    }
+    lastToggleTime = currentTime;
+  }
 
-  // String test = "";
+  String test = "";
+
+  if (counter == 0)
+  {
+    test = "1,1,1,1,1,1,1,1,.";
+  }
+  else if (counter == 1)
+  {
+    test = "1,2000,1,1,1,1,1,1,.";
+  }
+  else if (counter == 2)
+  {
+    test = "1,1,2000,1,1,1,1,1,.";
+  }
+  else if (counter == 3)
+  {
+    test = "1,1,1,2000,1,1,1,1,.";
+  }
+  else if (counter == 4)
+  {
+    test = "1,1,1,1,2000,1,1,1,.";
+  }
+  
   // for (int chan=0; chan<8; chan++) {
   //   int signalValue = signalOn ? random(2000, 4096) : random(0, 1000); // Simulate signal with noise
   //   test += String(signalValue);
   //   test += ",";
   // }
-  // test += ".";
+  // test += "1,1,1,1,2000,1,1,1,.";
 
-  // Serial.println(test);
-
-  adcData = generateFakeADC();
+  Serial.println(test);
 
   //================Bluetooth Code==================
-  // sendBluetoothData(adcData);
+  std::string payload = test.c_str();
+  if (deviceConnected) {
+    pTxCharacteristic->setValue(payload);  //String value
+    pTxCharacteristic->notify();
+    txValue++;
+    delay(100);  // bluetooth stack will go into congestion, if too many packets are sent
+  }
 
   // disconnecting
   if (!deviceConnected && oldDeviceConnected) {
@@ -205,25 +195,4 @@ void loop() {
     // do stuff here on connecting
     oldDeviceConnected = deviceConnected;
   }
-}
-
-
-String generateFakeADC()
-{
-    unsigned long currentTime = millis();
-
-    if (currentTime - lastToggleTime >= signalDuration) {
-      signalOn = !signalOn;
-      lastToggleTime = currentTime;
-    }
-
-    String test = "";
-    for (int chan=0; chan<8; chan++) {
-      int signalValue = signalOn ? random(2000, 4096) : random(0, 1000); // Simulate signal with noise
-      test += String(signalValue);
-      test += ",";
-    }
-    test += ".";
-
-    return test;
 }
