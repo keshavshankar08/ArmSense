@@ -8,18 +8,18 @@ body {
 }
 
 .container {
-    flex: 1;
+    height: 100vh;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
     padding: 10px;
     box-sizing: border-box;
-    height: 100%;
 }
 
 h1 {
     text-align: center;
-    margin: 10px 0;
-    font-size: 24px;
+    margin-bottom: 20px;
 }
 
 #semgContainer {
@@ -106,4 +106,49 @@ button:hover {
 
 #pairButton:hover {
     background-color: #2a5d7a;
+}
+
+#deviceContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+#deviceDropdown {
+    padding: 10px;
+    font-size: 16px;
+    width: 530px;
+    text-align: center;
+}
+
+.primary-button,
+#pairDeviceButton {
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    transition: background-color 0.3s ease;
+    width: 200px;
+    text-align: center;
+}
+
+.primary-button:hover,
+#pairDeviceButton:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 5px;
+    }
+    .primary-button,
+    #pairDeviceButton,
+    #deviceDropdown {
+        width: 90%;
+        max-width: 300px;
+    }
 }

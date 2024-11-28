@@ -31,19 +31,19 @@
         <h1>Data Collection: Point with Index Finger</h1>
         
         <div class="instruction-container">
-            <p>Please point with your index finger when instructed. Repeat 3 times.</p>
-            <img id="pointingImage" src="{{ url_for('static', filename='pointing_image.jpg') }}" alt="Person pointing with index finger">
-            <div id="counter">Repetitions: <span id="repCount">0</span>/3</div>
+            <p>Please point with your index finger when instructed. Repeat 10 times.</p>
+            <img id="pointingImage" src="{{ url_for('static', filename='images/IMG_0602.jpg') }}" alt="Person pointing with index finger">
+            <div id="counter">Repetitions: <span id="repCount">0</span>/10</div>
             <div id="message"></div>
             <button id="startButton" onclick="startCollection()">Start</button>
         </div>
     </div>
 
     <script>
-        const gestureClass = 2; // Set gesture class to 2 for "Point with Index Finger"
+        const gestureClass = 3; // Set gesture class to 2 for "Point with Index Finger"
         let repCount = 0;
-        const totalReps = 3;
-        const collectionDuration = 1000;
+        const totalReps = 10;
+        const collectionDuration = 2000;
 
         function startCollection() {
             document.getElementById('startButton').style.display = 'none';

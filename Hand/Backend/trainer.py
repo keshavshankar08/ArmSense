@@ -1,6 +1,3 @@
-import sys
-sys.path.append('.')
-
 import csv
 import numpy as np
 import tensorflow as tf
@@ -12,59 +9,43 @@ class Trainer:
         Initialize the Trainer with the default file name and an empty model.
         '''
         self.model = None
+        self.model_file_path = "Hand/Backend/Resources/model.h5"
+        self.feature_data_file_name = "Hand/Backend/Resources/feature_data.csv"
+        self.processed_data_file_name = "Hand/Backend/Resources/processed_data.csv"
+        self.normalization_bounds_file_name = "Hand/Backend/Resources/normalization_bounds.csv"
 
-    def clean_data(self, input_data_file_name, output_data_file_name):
+    def process_data(self):
         '''
-        Remove rows with missing values from the data file.
-
-        :param input_data_file_name: The name of the input data file.
-        :param output_data_file_name: The name of the output data file.
+        Clean and normalize the features in the data file and store min and max values.
         '''
         cleaned_data = []
-        with open(input_data_file_name, mode='r', newline='') as file:
+        with open(self.feature_data_file_name, mode='r', newline='') as file:
             reader = csv.reader(file)
             for row in reader:
                 if not any(cell == 'nan' for cell in row):
                     cleaned_data.append(row)
-        
-        with open(output_data_file_name, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerows(cleaned_data)
 
-    def normalize_data(self, input_data_file_name, output_data_file_name, output_bounds_file_name):
-        '''
-        Normalize the features in the data file and store min and max values.
-
-        :param input_data_file_name: The name of the input data file.
-        :param output_data_file_name: The name of the output data file.
-        :param output_bounds_file_name: The name of the output bounds file.
-        '''
-        data = []
-        with open(input_data_file_name, mode='r', newline='') as file:
-            reader = csv.reader(file)
-            for row in reader:
-                data.append(row)
-
-        data = np.array(data, dtype=float)
-        features = data[:, :48]
-        labels = data[:, 48]
+        data = np.array(cleaned_data, dtype=float)
+        features = data[:, :-1]
+        labels = data[:, -1]
 
         min_vals = features.min(axis=0)
         max_vals = features.max(axis=0)
-        normalized_features = (features - min_vals) / (max_vals - min_vals)
+        normalized_features = (features - min_vals) / (max_vals - min_vals + 1e-8)
 
         normalized_data = np.hstack((normalized_features, labels.reshape(-1, 1)))
+        normalized_data = np.array([[float(f"{cell:.2f}") for cell in row] for row in normalized_data])
 
-        with open(output_data_file_name, mode='w', newline='') as file:
+        with open(self.processed_data_file_name, mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerows(normalized_data)
 
-        with open(output_bounds_file_name, mode='w', newline='') as file:
+        with open(self.normalization_bounds_file_name, mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(min_vals)
             writer.writerow(max_vals)
 
-    def train_model(self, input_data_file_name, output_model_file_name):
+    def train_model(self):
         '''
         Train a model using the data in the data file.
 
@@ -72,7 +53,7 @@ class Trainer:
         :param output_model_file_name: The name of the output model file.
         '''
         data = []
-        with open(input_data_file_name, mode='r', newline='') as file:
+        with open(self.processed_data_file_name, mode='r', newline='') as file:
             reader = csv.reader(file)
             for row in reader:
                 data.append(row)
@@ -115,17 +96,4 @@ class Trainer:
         print(f"Test Loss: {results_test[0]:.4f}")
         print(f"Test Accuracy: {results_test[1]:.4f}")
 
-        self.model.save(output_model_file_name)
-
-    def read_normalization_bounds(self, input_bounds_file_name):
-        '''
-        Read the min and max values of the features for normalization.
-
-        :param input_bounds_file_name: The name of the input bounds file.
-        '''
-        with open(input_bounds_file_name, mode='r', newline='') as file:
-            reader = csv.reader(file)
-            min_vals = next(reader)
-            max_vals = next(reader)
-
-        return np.array(min_vals, dtype=float), np.array(max_vals, dtype=float)
+        self.model.save(self.model_file_path)

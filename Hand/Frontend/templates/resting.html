@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Collection - Resting</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .instruction-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #restingImage {
+            max-width: 300px;
+            margin: 20px auto;
+            display: block;
+        }
+        #counter {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        #message {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="instruction-container">
+        <h1>Resting Position</h1>
+        <p>Please keep your hand in a resting position for 20 seconds.</p>
+        <img id="restingImage" src="{{ url_for('static', filename='images/IMG_0599.jpg') }}" alt="Resting Hand">
+        <div id="counter"></div>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const gestureClass = 0; // Resting gesture class
+        const collectionDuration = 20000; // Duration in milliseconds (20 seconds)
+
+        function startCollection() {
+            document.getElementById('message').textContent = "Data collection in progress...";
+            startCountdown(collectionDuration / 1000); // Start countdown in seconds
+
+            // Start data collection
+            fetch('/start_collection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 'gesture_class': gestureClass })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Data collection started');
+                } else {
+                    console.error('Error starting data collection:', data.error);
+                    document.getElementById('message').textContent = "Error starting data collection.";
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                document.getElementById('message').textContent = "Error starting data collection.";
+            });
+
+            // Stop data collection after the specified duration
+            setTimeout(stopCollection, collectionDuration);
+        }
+
+        function stopCollection() {
+            // Stop data collection
+            fetch('/stop_collection', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('message').textContent = "Data collection complete!";
+                    // Redirect after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = "{{ url_for('data_collection') }}";
+                    }, 2000);
+                } else {
+                    document.getElementById('message').textContent = "Failed to stop data collection.";
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                document.getElementById('message').textContent = "Error stopping data collection.";
+            });
+        }
+
+        function startCountdown(duration) {
+            let remainingTime = duration;
+            document.getElementById('counter').textContent = `Time remaining: ${remainingTime} seconds`;
+
+            let countdownInterval = setInterval(() => {
+                remainingTime--;
+                if (remainingTime > 0) {
+                    document.getElementById('counter').textContent = `Time remaining: ${remainingTime} seconds`;
+                } else {
+                    clearInterval(countdownInterval);
+                    document.getElementById('counter').textContent = "Time's up!";
+                }
+            }, 1000);
+        }
+
+        // Start the collection when the page loads
+        window.onload = startCollection;
+    </script>
+</body>
+</html>

@@ -1,8 +1,4 @@
-import sys
-sys.path.append('.')
-
-from Backend.feature_extractor import *
-
+import Backend.feature_extractor as fe
 from collections import deque
 import time, threading
 import numpy as np
@@ -17,60 +13,67 @@ class DataCollector:
         """
         self.signal_receiver = signal_receiver
 
-        self.feature_extractor = FeatureExtractor()
-        self.feature_buffer = deque(maxlen=100)
+        self.feature_extractor = fe.FeatureExtractor()
         self.buffer_lock = threading.Lock()
         self.running = False
         self.thread = None
+        self.feature_data_file_name = "Hand/Backend/Resources/feature_data.csv"
+        self.data_file_name = "Hand/Backend/Resources/data.csv"
+        self.sampling_rate = 100
+        self.window_size = 0.2
+        self.interval_size = 0.05
+        self.max_recording_time = 20
+        self.feature_buffer = deque(maxlen=int(self.window_size * self.sampling_rate * self.max_recording_time))
+        self.data_buffer = deque(maxlen=int(self.sampling_rate * self.max_recording_time))
 
-    def start_collection(self, gesture_class, sampling_rate, window_size, interval_size):
+    def start_collection(self, gesture_class):
         """
         Starts the data collection thread.
 
         :param gesture_class: The class of the gesture to be collected.
-        :param sampling_rate: The sampling rate of the signal receiver.
-        :param window_size: The size of the window to be collected.
-        :param interval_size: The interval size between each collection
         """
         self.running = True
-        self.thread = threading.Thread(target=self.collect_data, args=(gesture_class, sampling_rate, window_size, interval_size,), daemon=True)
+        self.thread = threading.Thread(target=self.collect_data, args=(gesture_class,), daemon=True)
         self.thread.start()
 
-    def stop_collection(self, output_data_file_name):
+    def stop_collection(self):
         """
         Stops the data collection thread.
-
-        :param output_data_file_name: The name of the file to save the collected data.
         """
         self.running = False
         if self.thread:
             self.thread.join()
-        self.save_data(output_data_file_name)
+        self.save_data()
 
-    def collect_data(self, gesture_class, sampling_rate, window_size, interval_size):
+    def collect_data(self, gesture_class):
         '''
         Collects data for the given gesture class.
 
         :param gesture_class: The class of the gesture to be collected.
-        :param sampling_rate: The sampling rate of the signal receiver.
-        :param window_size: The size of the window to be collected.
-        :param interval_size: The interval size between each collection
         '''
+        with self.buffer_lock:
+            self.feature_buffer.clear()
+            self.data_buffer.clear()
+            
         start_time = time.time()
 
         while self.running:
             current_time = time.time()
             elapsed_time = current_time - start_time
 
-            if (elapsed_time >= interval_size):
-                window = self.signal_receiver.get_last_n_signals(int(window_size * sampling_rate))
+            if (elapsed_time >= self.interval_size):
+                window = self.signal_receiver.get_last_n_signals(int(self.window_size * self.sampling_rate))
                 features = self.feature_extractor.extract_features(window)
                 features = np.append(features, gesture_class)
+                data = window[:int(self.interval_size * self.sampling_rate), :]
+                gesture_column = np.full((data.shape[0], 1), gesture_class)
+                data = np.hstack((data, gesture_column))
                 with self.buffer_lock:
                     self.feature_buffer.append(features)
+                    self.data_buffer.append(data)
                 start_time = current_time
 
-    def save_data(self, output_data_file_name):
+    def save_data(self):
         '''
         Saves the collected data to a file.
 
@@ -78,9 +81,26 @@ class DataCollector:
         '''
         with self.buffer_lock:
             try:
-                with open(output_data_file_name, mode='a', newline='') as file:
+                with open(self.feature_data_file_name, mode='a', newline='') as file:
                     writer = csv.writer(file)
                     while self.feature_buffer:
                         writer.writerow(self.feature_buffer.popleft())
+                with open(self.data_file_name, mode='a', newline='') as file:
+                    writer = csv.writer(file)
+                    while self.data_buffer:
+                        for row in self.data_buffer.popleft():
+                            writer.writerow(row)
             except Exception as e:
                 return
+            
+    def clear_data(self):
+        '''
+        Clears the data set collection files.
+        '''
+        try:
+            with open(self.feature_data_file_name, 'w') as file:
+                file.truncate(0)
+            with open(self.data_file_name, 'w') as file:
+                file.truncate(0)
+        except Exception as e:
+            return 

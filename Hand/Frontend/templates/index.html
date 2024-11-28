@@ -2,21 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArmSense</title>
+    <title>Device Selection</title>
+    <!-- Include the stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Machine Learning for Robotic Prosthetic Hand Control</h1>
+        <h1>Select a Device</h1>
         
-        <div class="button-container">
-            <button id="pairButton">Pair Armband</button>
+        <div id="deviceContainer">
+            <button id="findDevicesButton" class="primary-button">Find Devices</button>
+            <select id="deviceDropdown" style="display:none;"></select>
+            <button id="pairDeviceButton" class="primary-button" style="display:none;">Pair Device</button>
         </div>
-        
-        <div id="status"></div>
-    </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+        <!-- Include script.js -->
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+    </div>
 </body>
 </html>
