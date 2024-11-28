@@ -32,7 +32,7 @@ void sendBTData();
 
 
 //=================================== GLOBAL DEFS ==============================
-#define INTERVAL 8
+#define INTERVAL 9
 //=================================== GLOBAL DEFS ==============================
 
 //=================================== GLOBAL VARS ==============================
@@ -41,6 +41,12 @@ String adcData = "";
 unsigned long previousTime = 0; 
 bool transmitFailed = false;
 //=================================== GLOBAL VARS ==============================
+
+//============================== FastLED Definitions ==============================
+#define NUM_LEDS 1
+#define DATA_PIN 26
+CRGB leds[NUM_LEDS];
+//========================== End FastLED Definitions ==============================
 
 
 //Callback for the bluetooth server. 
@@ -51,27 +57,25 @@ class MyServerCallbacks : public BLEServerCallbacks {
 
   void onDisconnect(BLEServer *pServer) {
     deviceConnected = false;
+    Serial.println("Client Disconnected");
+    leds[0] = CRGB::Orange;  //BT Setup
+    FastLED.show();
   }
 };
 
-void gattsEventCallback(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t* param) {
-    if (event == ESP_GATTS_CONF_EVT) {
-        if (param->conf.status != ESP_GATT_OK) {
-          Serial.printf("Notification failed with status: %d\n", param->conf.status);
-          transmitFailed = true;
-        }
-        else if (param->conf.status == ESP_GATT_OK)
-        {
-          transmitFailed = false;
-        }
-    }
-}
+// void gattsEventCallback(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t* param) {
+//     if (event == ESP_GATTS_CONF_EVT) {
+//         if (param->conf.status != ESP_GATT_OK) {
+//           Serial.printf("Notification failed with status: %d\n", param->conf.status);
+//           transmitFailed = true;
+//         }
+//         else if (param->conf.status == ESP_GATT_OK)
+//         {
+//           transmitFailed = false;
+//         }
+//     }
+// }
 
-//============================== FastLED Definitions ==============================
-#define NUM_LEDS 1
-#define DATA_PIN 26
-CRGB leds[NUM_LEDS];
-//========================== End FastLED Definitions ==============================
 
 void setup() {
   // put your setup code here, to run once:
