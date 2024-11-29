@@ -180,6 +180,7 @@ def stop_collection():
 @app.route('/train_model', methods=['POST'])
 def train_model():
     try:
+        print("Training model")
         backend.trainer.process_data()
         time.sleep(1)
 

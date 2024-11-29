@@ -25,7 +25,7 @@
             <a href="{{ url_for('resting') }}">
                 <button>Collect Data</button>
             </a>
-            <button onclick="trainModel()">Train Model</button>
+            <button id="trainModel">Train Model</button>
             <button onclick="evaluateModel()">Evaluate Model</button>
             <button id="disconnectButton">Disconnect</button>
         </div>
@@ -33,13 +33,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script>
+    <!-- <script>
     function trainModel() {
         fetch('/train_model', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            method: 'POST'
         })
         .then(response => response.json())
         .then(data => {
@@ -53,7 +50,7 @@
             console.error('Error:', error);
         });
     }
-    </script>
+    </script> -->
     <script>
     function evaluateModel() {
         fetch('/evaluate_model', {

@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const homeButton = document.getElementById('homeButton');
     const evaluateButton = document.getElementById('evaluateButton');
     const disconnectButton = document.getElementById('disconnectButton');
+    const trainModel = document.getElementById('trainModel');
 
     if (findDevicesButton) {
         findDevicesButton.addEventListener('click', async () => {
@@ -45,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
     if (pairDeviceButton) {
         pairDeviceButton.addEventListener('click', async () => {
             try {
@@ -124,6 +124,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
         });
     }
+    if (trainModel) {
+        trainModel.addEventListener('click', () => {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => button.disabled = true);
+
+            fetch('/train_model', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Model training started successfully.');
+                } else {
+                    alert('Error during model training: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during model training. Please try again.');
+            })
+            .finally(() => {
+                buttons.forEach(button => button.disabled = false);
+            });
+        });
+    }
+
     fetch('check_model')
         .then(response => response.json())
         .then(data => {
@@ -160,33 +184,31 @@ function pairArmband() {
     }
 }
 
-function trainModel() {
-    //log('trainModel', 'Training model');
-    try {
-        const buttons = document.querySelectorAll('button');
-        buttons.forEach(button => button.disabled = true);
-        fetch('/train', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    log('trainModel', 'Model trained successfully');
-                    alert('Model trained successfully.');
-                } else {
-                    log('trainModel', 'Model training failed');
-                    alert('Model training failed. Please try again.');
-                }
-            })
-            .catch(error => {
-                log('trainModel', 'Error during model training', error);
-            });
-        buttons.forEach(button => button.disabled = false);
-    } catch (error) {
-        log('trainModel', 'Unexpected error', error);
-    }
-}
+// function trainModel() {
+//     try {
+//         const buttons = document.querySelectorAll('button');
+//         buttons.forEach(button => button.disabled = true);
+//         fetch('/train_model', { method: 'POST' })
+//             .then(response => response.json())
+//             .then(data => {
+//                 if (data.success) {
+//                     log('trainModel', 'Model trained successfully');
+//                     alert('Model trained successfully.');
+//                 } else {
+//                     log('trainModel', 'Model training failed');
+//                     alert('Model training failed. Please try again.');
+//                 }
+//             })
+//             .catch(error => {
+//                 log('trainModel', 'Error during model training', error);
+//             });
+//         buttons.forEach(button => button.disabled = false);
+//     } catch (error) {
+//         log('trainModel', 'Unexpected error', error);
+//     }
+// }
 
 function evaluateModel() {
-    log('evaluateModel', 'Evaluating model');
     try {
         fetch('/evaluate', { method: 'POST' })
             .then(response => response.json())
@@ -203,16 +225,13 @@ function evaluateModel() {
 }
 
 function collectData() {
-    log('collectData', 'Collecting data');
     try {
         fetch('/collect', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    log('collectData', 'Data collected successfully');
                     alert('Data collected successfully.');
                 } else {
-                    log('collectData', 'Data collection failed');
                     alert('Data collection failed. Please try again.');
                 }
             })
@@ -225,7 +244,6 @@ function collectData() {
 }
 
 function findDevices() {
-    log('findDevices', 'Finding Bluetooth devices');
     fetch('/find_devices', { method: 'POST' })
         .then(response => response.json())
         .then(data => {
