@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <title>Gesture Prediction</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        #gesture-image {
+            width: 300px;
+            height: 16px auto;
+            display: block;
+        }
+        #homeButton {
+            margin-top: 20px;
+        }
+    </style>
     <script>
         function fetchLatestPrediction() {
             fetch('/get_latest_prediction')

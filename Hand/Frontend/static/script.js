@@ -317,7 +317,7 @@ function initializeCharts() {
                             beginAtZero: true,
                             display: true,
                             min: 0,       // Set the minimum value of the y-axis to 0
-                            max: 2000,    // Set the maximum value of the y-axis to 2000
+                            max: 5000,    // Set the maximum value of the y-axis to 2000
                             title: {
                                 display: true,
                                 text: 'Amplitude'
