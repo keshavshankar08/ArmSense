@@ -9,7 +9,8 @@ import asyncio
 import bleak
 from statistics import mode
 import os
-
+import numpy as np
+import time
 app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
 backend = ControllerBackend()
 
@@ -215,6 +216,35 @@ def send_serial_command(prediction_index):
             ser.write(f"{command_value}".encode())
             ser.flush()
 
+# def continuous_prediction():
+#     global latest_prediction
+#     try:
+#         # Perform model evaluation
+#         backend.predictor.start_prediction()
+        
+#         while True:
+#             # Check for errors in the predictor thread
+#             error = backend.predictor.get_error()
+#             if error:
+#                 raise error  # This will be caught by the except block
+
+#             # Get the prediction
+#             prediction_index = backend.predictor.get_prediction()
+#             if prediction_index is not None:
+#                 # Map the prediction index to the gesture label
+#                 latest_prediction = gesture_labels.get(prediction_index, 'Unknown')
+
+#                 # Send the predicted gesture over serial
+#                 send_serial_command(prediction_index)
+#             else:
+#                 latest_prediction = 'No prediction made.'
+#             time.sleep(1)  # Adjust sleep time as needed
+
+#     except Exception as e:
+#         backend.predictor.stop_prediction()
+
+
+
 def continuous_prediction():
     global latest_prediction
     try:
@@ -222,25 +252,42 @@ def continuous_prediction():
         backend.predictor.start_prediction()
         
         while True:
-            # Check for errors in the predictor thread
-            error = backend.predictor.get_error()
-            if error:
-                raise error  # This will be caught by the except block
+            predictions = [] 
+            # Collect predictions for one second
+            start_time_prediction = time.time()
+            while time.time() - start_time_prediction < 1:
+                # Check for errors in the predictor thread
+                error = backend.predictor.get_error()
+                if error:
+                    raise error  # This will be caught by the except block
 
-            # Get the prediction
-            prediction_index = backend.predictor.get_prediction()
-            if prediction_index is not None:
-                # Map the prediction index to the gesture label
-                latest_prediction = gesture_labels.get(prediction_index, 'Unknown')
+                # Get the prediction
+                prediction_index = backend.predictor.get_prediction()
+                print(prediction_index)
+                if prediction_index is not None:
+                    predictions.append(prediction_index)
 
-                # Send the predicted gesture over serial
-                send_serial_command(prediction_index)
+                time.sleep(0.1)  # Adjust sleep time as needed
+
+            # Calculate the mean of the predictions
+            if predictions:
+                mean_prediction = np.mean(predictions)
+                if mean_prediction % 2 == 0:
+                    latest_prediction = 0
+                else:
+                    # Map the mean prediction index to the gesture label
+                    latest_prediction = gesture_labels.get(int(round(mean_prediction)), 'Unknown')
             else:
                 latest_prediction = 'No prediction made.'
-            time.sleep(1)  # Adjust sleep time as needed
+
+            # Send the predicted gesture over serial
+            if latest_prediction != 'No prediction made.':
+                send_serial_command(prediction_index)
 
     except Exception as e:
         backend.predictor.stop_prediction()
+
+
 
 @app.route('/get_latest_prediction', methods=['GET'])
 def get_latest_prediction():
