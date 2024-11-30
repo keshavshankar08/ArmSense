@@ -48,7 +48,7 @@
                 .catch(error => console.error('Error fetching latest prediction:', error));
         }
 
-        setInterval(fetchLatestPrediction, 1000);  // Fetch every second
+        setInterval(fetchLatestPrediction, 100);  // Fetch every 100 ms
     </script>
 </head>
 <body>

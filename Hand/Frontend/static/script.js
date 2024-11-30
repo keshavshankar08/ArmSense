@@ -184,30 +184,6 @@ function pairArmband() {
     }
 }
 
-// function trainModel() {
-//     try {
-//         const buttons = document.querySelectorAll('button');
-//         buttons.forEach(button => button.disabled = true);
-//         fetch('/train_model', { method: 'POST' })
-//             .then(response => response.json())
-//             .then(data => {
-//                 if (data.success) {
-//                     log('trainModel', 'Model trained successfully');
-//                     alert('Model trained successfully.');
-//                 } else {
-//                     log('trainModel', 'Model training failed');
-//                     alert('Model training failed. Please try again.');
-//                 }
-//             })
-//             .catch(error => {
-//                 log('trainModel', 'Error during model training', error);
-//             });
-//         buttons.forEach(button => button.disabled = false);
-//     } catch (error) {
-//         log('trainModel', 'Unexpected error', error);
-//     }
-// }
-
 function evaluateModel() {
     try {
         fetch('/evaluate', { method: 'POST' })

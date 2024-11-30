@@ -7,9 +7,9 @@ from collections import deque
 from Backend.controller_backend import ControllerBackend
 import asyncio
 import bleak
-from statistics import mode
+from statistics import mode, StatisticsError
 import os
-import numpy as np
+import statistics
 import time
 app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
 backend = ControllerBackend()
@@ -244,50 +244,36 @@ def send_serial_command(prediction_index):
 #         backend.predictor.stop_prediction()
 
 
-
 def continuous_prediction():
     global latest_prediction
     try:
-        # Perform model evaluation
         backend.predictor.start_prediction()
-        
         while True:
-            predictions = [] 
-            # Collect predictions for one second
+            error = backend.predictor.get_error()
+            if error:
+                raise error
+            predictions = deque(maxlen=10)
             start_time_prediction = time.time()
             while time.time() - start_time_prediction < 1:
-                # Check for errors in the predictor thread
-                error = backend.predictor.get_error()
-                if error:
-                    raise error  # This will be caught by the except block
-
-                # Get the prediction
                 prediction_index = backend.predictor.get_prediction()
-                print(prediction_index)
                 if prediction_index is not None:
                     predictions.append(prediction_index)
-
-                time.sleep(0.1)  # Adjust sleep time as needed
-
-            # Calculate the mean of the predictions
-            if predictions:
-                mean_prediction = np.mean(predictions)
-                if mean_prediction % 2 == 0:
-                    latest_prediction = 0
-                else:
-                    # Map the mean prediction index to the gesture label
-                    latest_prediction = gesture_labels.get(int(round(mean_prediction)), 'Unknown')
+                time.sleep(0.1) #sleep for 100ms, for 10 predictions a second
+            if predictions: 
+                try:
+                    mode_prediction = mode(predictions)
+                    print(mode_prediction)
+                except StatisticsError:
+                    mode_prediction = predictions[0] #most recent prediction if 50/50 split
+                latest_prediction = gesture_labels.get(mode_prediction, 'Unknown')
+                send_serial_command(mode_prediction)
+                print(latest_prediction)
             else:
                 latest_prediction = 'No prediction made.'
-
-            # Send the predicted gesture over serial
-            if latest_prediction != 'No prediction made.':
-                send_serial_command(prediction_index)
-
+            predictions.clear()
     except Exception as e:
         backend.predictor.stop_prediction()
-
-
+        print("Error in continuous prediction: ", e)
 
 @app.route('/get_latest_prediction', methods=['GET'])
 def get_latest_prediction():
