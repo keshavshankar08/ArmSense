@@ -14,7 +14,7 @@ class SignalReceiver:
         self.running = False
         self.thread = None
 
-        self.device_name = "ArmSense"
+        self.device_name = "ArmSense1"
         self.bt_address = ""
         self.CHARACTERISTIC_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
         self.client = BleakClient(self.bt_address)
@@ -110,7 +110,8 @@ class SignalReceiver:
         Scans for Bluetooth devices and stores the names and addresses of those called "MDT UART Service" in a list.
         """
         devices = await BleakScanner.discover()
-        self.devices = [(device.name, device.address) for device in devices if device.name and device.name[:-1] == self.device_name]
+        #self.devices = [(device.name, device.address) for device in devices if device.name and device.name[:-1] == self.device_name]
+        self.devices = [(device.name, device.address) for device in devices if device.name and device.name == self.device_name]
 
     async def set_device(self, device_name):
         """

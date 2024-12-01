@@ -6,7 +6,11 @@ from threading import Thread, Lock
 from collections import deque
 from Backend.controller_backend import ControllerBackend
 import asyncio
-
+import bleak
+from statistics import mode, StatisticsError
+import os
+import statistics
+import time
 app = Flask(__name__, template_folder='Frontend/templates', static_folder='Frontend/static')
 backend = ControllerBackend()
 
@@ -177,6 +181,7 @@ def stop_collection():
 @app.route('/train_model', methods=['POST'])
 def train_model():
     try:
+        print("Training model")
         backend.trainer.process_data()
         time.sleep(1)
 
@@ -211,32 +216,64 @@ def send_serial_command(prediction_index):
             ser.write(f"{command_value}".encode())
             ser.flush()
 
+# def continuous_prediction():
+#     global latest_prediction
+#     try:
+#         # Perform model evaluation
+#         backend.predictor.start_prediction()
+        
+#         while True:
+#             # Check for errors in the predictor thread
+#             error = backend.predictor.get_error()
+#             if error:
+#                 raise error  # This will be caught by the except block
+
+#             # Get the prediction
+#             prediction_index = backend.predictor.get_prediction()
+#             if prediction_index is not None:
+#                 # Map the prediction index to the gesture label
+#                 latest_prediction = gesture_labels.get(prediction_index, 'Unknown')
+
+#                 # Send the predicted gesture over serial
+#                 send_serial_command(prediction_index)
+#             else:
+#                 latest_prediction = 'No prediction made.'
+#             time.sleep(1)  # Adjust sleep time as needed
+
+#     except Exception as e:
+#         backend.predictor.stop_prediction()
+
+
 def continuous_prediction():
     global latest_prediction
     try:
-        # Perform model evaluation
         backend.predictor.start_prediction()
-        
         while True:
-            # Check for errors in the predictor thread
             error = backend.predictor.get_error()
             if error:
-                raise error  # This will be caught by the except block
-
-            # Get the prediction
-            prediction_index = backend.predictor.get_prediction()
-            if prediction_index is not None:
-                # Map the prediction index to the gesture label
-                latest_prediction = gesture_labels.get(prediction_index, 'Unknown')
-
-                # Send the predicted gesture over serial
-                send_serial_command(prediction_index)
+                raise error
+            predictions = deque(maxlen=10)
+            start_time_prediction = time.time()
+            while time.time() - start_time_prediction < 1:
+                prediction_index = backend.predictor.get_prediction()
+                if prediction_index is not None:
+                    predictions.append(prediction_index)
+                time.sleep(0.1) #sleep for 100ms, for 10 predictions a second
+            if predictions: 
+                try:
+                    mode_prediction = mode(predictions)
+                    print(mode_prediction)
+                except StatisticsError:
+                    mode_prediction = predictions[0] #most recent prediction if 50/50 split
+                latest_prediction = gesture_labels.get(mode_prediction, 'Unknown')
+                send_serial_command(mode_prediction)
+                print(latest_prediction)
             else:
                 latest_prediction = 'No prediction made.'
-            time.sleep(1)  # Adjust sleep time as needed
-
+            predictions.clear()
     except Exception as e:
         backend.predictor.stop_prediction()
+        print("Error in continuous prediction: ", e)
 
 @app.route('/get_latest_prediction', methods=['GET'])
 def get_latest_prediction():
@@ -257,6 +294,19 @@ def stop_prediction():
 @app.route('/resting', methods=['GET', 'POST'])
 def resting():
     return render_template('resting.html')
+
+@app.route('/check_model', methods=['GET'])
+def check_model():
+    model_exists = os.path.exists('Hand/Backend/Resources/model.h5')
+    return jsonify({'modelAvailable': model_exists})
+
+@app.route('/disconnect', methods=['POST'])
+def disconnect():
+    try:
+        backend.signal_receiver.stop_reception()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
 
 if __name__ == '__main__':
     print(app.url_map)
