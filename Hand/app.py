@@ -248,17 +248,19 @@ def continuous_prediction():
     global latest_prediction
     try:
         backend.predictor.start_prediction()
-        while True:
+        while backend.predictor.running:
             error = backend.predictor.get_error()
             if error:
                 raise error
             predictions = deque(maxlen=10)
             start_time_prediction = time.time()
-            while time.time() - start_time_prediction < 1:
+            while time.time() - start_time_prediction < 1 and backend.predictor.running:
                 prediction_index = backend.predictor.get_prediction()
                 if prediction_index is not None:
                     predictions.append(prediction_index)
                 time.sleep(0.1) #sleep for 100ms, for 10 predictions a second
+            if not backend.predictor.running:
+                break
             if predictions: 
                 try:
                     mode_prediction = mode(predictions)
@@ -271,6 +273,7 @@ def continuous_prediction():
             else:
                 latest_prediction = 'No prediction made.'
             predictions.clear()
+        backend.predictor.stop_prediction()
     except Exception as e:
         backend.predictor.stop_prediction()
         print("Error in continuous prediction: ", e)
