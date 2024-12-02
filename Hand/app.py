@@ -15,7 +15,7 @@ app = Flask(__name__, template_folder='Frontend/templates', static_folder='Front
 backend = ControllerBackend()
 
 # Serial port configuration
-SERIAL_PORT = '/dev/ttyUSB1'
+SERIAL_PORT = '/dev/ttyUSB0'
 BAUD_RATE = 115200
 
 try:
