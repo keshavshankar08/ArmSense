@@ -9,7 +9,19 @@
 5. [Disclaimer](#disclaimer)
 
 ## Demo
+[![ArmSense Demo](https://img.youtube.com/vi/5yEP6_xSgd4/0.jpg)](https://www.youtube.com/watch?v=5yEP6_xSgd4)
+
+## Poster
+![ArmSense Poster](images/ArmSense%20Poster.jpg)
+
+## System Demo
 [![ArmSense Demo](https://img.youtube.com/vi/brOqvoJR-Mg/0.jpg)](https://www.youtube.com/watch?v=brOqvoJR-Mg)
+
+## Data Collection Demo
+[![ArmSense Demo](https://img.youtube.com/vi/axb__EIW6_c/0.jpg)](https://www.youtube.com/watch?v=axb__EIW6_c)
+
+## Prediction Demo
+[![ArmSense Demo](https://img.youtube.com/vi/NKN60mDg72c/0.jpg)](https://www.youtube.com/watch?v=NKN60mDg72c)
 
 ## Description
 Over 500,000 Americans face limb loss or birth defects annually, with 5.6 million living with such disabilities in the U.S. Robotic prosthetics offer a potential solution, but their prohibitive cost of $20,000 to $100,000 limits accessibility, impacting quality of life.​ 
