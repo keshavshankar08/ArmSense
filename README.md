@@ -2,17 +2,22 @@
 <img src="images/armsense_logo.png" alt="ArmSense Logo" width="300">
 
 ## Table of Contents
+
 1. [Demo](#demo)
-2. [Description](#description)
-3. [Pictures](#pictures)
-4. [Collaborators](#collaborators)
-5. [Disclaimer](#disclaimer)
+2. [Poster](#poster)
+3. [System Demo](#system-demo)
+4. [Data Collection Demo](#data-collection-demo)
+5. [Prediction Demo](#prediction-demo)
+6. [Description](#description)
+7. [Pictures](#pictures)
+8. [Collaborators](#collaborators)
+9. [Disclaimer](#disclaimer)
 
 ## Demo
 [![ArmSense Demo](https://img.youtube.com/vi/5yEP6_xSgd4/0.jpg)](https://www.youtube.com/watch?v=5yEP6_xSgd4)
 
 ## Poster
-![ArmSense Poster](images/ArmSense%20Poster.jpg)
+![ArmSense Poster](images/armsense_poster.jpg)
 
 ## System Demo
 [![ArmSense Demo](https://img.youtube.com/vi/brOqvoJR-Mg/0.jpg)](https://www.youtube.com/watch?v=brOqvoJR-Mg)
